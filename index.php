@@ -32,16 +32,21 @@ $db->close();
 $category = isset($_GET['category']) ? sanitize($_GET['category']) : null;
 $state = isset($_GET['state']) ? sanitize($_GET['state']) : null;
 $city = isset($_GET['city']) ? sanitize($_GET['city']) : null;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = 10;
 
 // Get postings based on filters or show VIP listings if no filters
 $filteredPostings = [];
+$totalPostings = 0;
 $postingModel = new Posting();
 
 if ($category || $state || $city) {
-    // Get filtered postings
-    $filteredPostings = $postingModel->getAll($category, null, $state, $city);
+    // Get filtered postings with pagination
+    $offset = ($page - 1) * $perPage;
+    $filteredPostings = $postingModel->getAll($category, null, $state, $city, $perPage, $offset);
+    $totalPostings = $postingModel->getTotalCount($category, null, $state, $city);
 } else {
-    // Get VIP featured listings (recent 6 postings)
+    // Get VIP featured listings (recent 6 postings) - no pagination for home page
     $filteredPostings = $postingModel->getRecent(6);
 }
 
@@ -88,6 +93,7 @@ if (!empty($filteredPostings) && !$category && !$state && !$city) {
     <title><?php echo APP_NAME; ?> - Buy and Sell Everything</title>
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time() + 1000; ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .similar-postings .posting-cards {
             display: grid;
@@ -227,6 +233,172 @@ if (!empty($filteredPostings) && !$category && !$state && !$city) {
     </style>
 </head>
 <body class="index-body">
+    <!-- Age Verification Modal -->
+    <div class="modal fade" id="ageVerificationModal" tabindex="-1" aria-labelledby="ageVerificationModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content age-verification-modal">
+                <div class="modal-header age-modal-header">
+                    <h5 class="modal-title age-modal-title" id="ageVerificationModalLabel">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Age Verification Required
+                    </h5>
+                </div>
+                <div class="modal-body age-modal-body">
+                    <div class="age-verification-content">
+                        <i class="fas fa-user-shield age-icon"></i>
+                        <h4 class="age-question">Are you 18 years or older?</h4>
+                        <p class="age-description">This website contains content intended for adults only. By proceeding, you confirm that you are 18 years of age or older and agree to view adult content.</p>
+                        <div class="age-buttons">
+                            <button type="button" class="btn btn-primary age-btn-confirm" id="confirmAge">
+                                <i class="fas fa-check"></i> Yes, I am 18+
+                            </button>
+                            <button type="button" class="btn btn-secondary age-btn-deny" id="denyAge">
+                                <i class="fas fa-times"></i> No, I am under 18
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .age-verification-modal {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .age-modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-bottom: none;
+        padding: 2rem 2rem 1.5rem;
+        text-align: center;
+    }
+
+    .age-modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .age-modal-title i {
+        color: #ffd700;
+        font-size: 1.2rem;
+    }
+
+    .age-modal-body {
+        padding: 2.5rem 2rem;
+        background: white;
+    }
+
+    .age-verification-content {
+        text-align: center;
+    }
+
+    .age-icon {
+        font-size: 4rem;
+        color: #667eea;
+        margin-bottom: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .age-question {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+    }
+
+    .age-description {
+        font-size: 1rem;
+        color: #718096;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .age-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .age-btn-confirm {
+        background-color: #667eea;
+        border-color: #667eea;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        min-width: 140px;
+    }
+
+    .age-btn-confirm:hover {
+        background-color: #5a6fd8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .age-btn-deny {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        min-width: 140px;
+    }
+
+    .age-btn-deny:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+    }
+
+    @media (max-width: 576px) {
+        .age-modal-header {
+            padding: 1.5rem 1rem 1rem;
+        }
+
+        .age-modal-title {
+            font-size: 1.3rem;
+        }
+
+        .age-modal-body {
+            padding: 2rem 1rem;
+        }
+
+        .age-question {
+            font-size: 1.5rem;
+        }
+
+        .age-description {
+            font-size: 0.95rem;
+        }
+
+        .age-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .age-btn-confirm,
+        .age-btn-deny {
+            width: 100%;
+            max-width: 250px;
+        }
+    }
+    </style>
+
     <?php include 'includes/header.php'; ?>
 
     <?php if (isAdmin()): ?>
@@ -256,7 +428,7 @@ if (!empty($filteredPostings) && !$category && !$state && !$city) {
         <?php endif; ?>
         <ul>
             <li><a href="index.php" class="active"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
             <?php if (isLoggedIn()): ?>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>
@@ -365,7 +537,7 @@ Delhi</option>
                                     'Andhra Pradesh' => ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Tirupati', 'Nellore', 'Kakinada', 'Rajahmundry', 'Kadapa', 'Kurnool', 'Anantapur'],
                                     'Arunachal Pradesh' => ['Itanagar', 'Naharlagun', 'Pasighat', 'Tezpur', 'Dibang Valley', 'Roing', 'Ziro', 'Bomdila'],
                                     'Assam' => ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Nagaon', 'Tinsukia', 'Tezpur', 'Bongaigaon'],
-                                    'Biar' => ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Darbhanga', 'Arrah', 'Begusarai', 'Katihar', 'Munger', 'Purnia'],
+                                    'Bihar' => ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Darbhanga', 'Arrah', 'Begusarai', 'Katihar', 'Munger', 'Purnia'],
                                     'Chhattisgarh' => ['Raipur', 'Bhilai', 'Bilaspur', 'Durg', 'Rajnandgaon', 'Korba', 'Raigarh', 'Mahasamund'],
                                     'Goa' => ['Panaji', 'Margao', 'Vasco da Gama', 'Mapusa', 'Ponda', 'Curchorem', 'Benaulim'],
                                     'Gujarat' => ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar', 'Junagadh', 'Gandhidham', 'Anand', 'Bharuch'],
@@ -730,14 +902,41 @@ Delhi</option>
             }
         }
 
+        // Age verification logic
+        function checkAgeVerification() {
+            const ageVerified = localStorage.getItem('ageVerified');
+            if (!ageVerified) {
+                const modal = new bootstrap.Modal(document.getElementById('ageVerificationModal'), {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                modal.show();
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Check age verification on page load
+            checkAgeVerification();
+
+            // Handle age confirmation
+            document.getElementById('confirmAge').addEventListener('click', function() {
+                localStorage.setItem('ageVerified', 'true');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('ageVerificationModal'));
+                modal.hide();
+            });
+
+            // Handle age denial
+            document.getElementById('denyAge').addEventListener('click', function() {
+                window.location.href = 'https://www.google.com'; // Redirect to safe site
+            });
+
             const searchForm = document.getElementById('searchForm');
             if (searchForm) {
                 searchForm.addEventListener('submit', function(e) {
                     const category = document.getElementById('category').value;
                     const state = document.getElementById('state').value;
                     const city = document.getElementById('city').value;
-                    
+
                     if (category) {
                         let url = 'search.php?category=' + encodeURIComponent(category);
                         if (state) url += '&state=' + encodeURIComponent(state);
@@ -752,5 +951,6 @@ Delhi</option>
             }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

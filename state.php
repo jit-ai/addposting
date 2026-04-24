@@ -9,6 +9,8 @@ $db = new Database();
 
 // Get state from URL parameter
 $state = isset($_GET['state']) ? sanitize($_GET['state']) : null;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = 10;
 
 // If state not provided, redirect to home
 if (!$state) {
@@ -45,8 +47,12 @@ $city = isset($_GET['city']) ? sanitize($_GET['city']) : null;
 
 // Get filtered postings
 $filteredPostings = [];
+$totalPostings = 0;
 $postingModel = new Posting();
-$filteredPostings = $postingModel->getAll($category, null, $state, $city);
+
+$offset = ($page - 1) * $perPage;
+$filteredPostings = $postingModel->getAll($category, null, $state, $city, $perPage, $offset);
+$totalPostings = $postingModel->getTotalCount($category, null, $state, $city);
 
 // Get posting count for this state
 $countSql = "SELECT COUNT(*) as count FROM postings WHERE state = ? AND status = 'active'";
@@ -215,12 +221,23 @@ $db->close();
                                 <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn">
                                     <i class="fas fa-phone"></i> Call
                                 </a>
+                                <a href="https://t.me/+<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="telegram-btn" target="_blank">
+                                    <i class="fab fa-telegram"></i> Telegram
+                                </a>
                             </div>
                         </div>
                     </div>
                     <?php endforeach; ?>
-                </div>
-            <?php else: ?>
+                    </div>
+
+                    <?php if ($totalPostings > $perPage): ?>
+                        <?php
+                        $queryParams = ['state' => $state];
+                        if ($category) $queryParams['category'] = $category;
+                        echo generatePagination($totalPostings, $perPage, $page, 'state.php', $queryParams);
+                        ?>
+                    <?php endif; ?>
+                <?php else: ?>
                 <div class="no-postings" style="text-align: center; padding: 4rem 2rem;">
                     <i class="fas fa-map" style="font-size: 4rem; color: #64748b;"></i>
                     <h3>No Services in <?php echo $state; ?> Yet</h3>

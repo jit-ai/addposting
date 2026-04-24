@@ -8,6 +8,9 @@ RewriteRule ^ - [L]
 # Block sensitive files
 RewriteRule ^(config|sql|includes/database\.php|debug-) - [F,L]
 
+# Redirect old URL to new URL
+RewriteRule ^addposting\.php$ add-posting.php [R=301,L]
+
 # Skip real files
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]

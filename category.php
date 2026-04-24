@@ -9,6 +9,8 @@ $db = new Database();
 
 // Get category from URL parameter
 $category = isset($_GET['category']) ? sanitize($_GET['category']) : null;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = 10;
 
 // Validate category exists and is active
 $categoryDetails = null;
@@ -44,8 +46,12 @@ $city = isset($_GET['city']) ? sanitize($_GET['city']) : null;
 
 // Get filtered postings
 $filteredPostings = [];
+$totalPostings = 0;
 $postingModel = new Posting();
-$filteredPostings = $postingModel->getAll($category, null, $state, $city);
+
+$offset = ($page - 1) * $perPage;
+$filteredPostings = $postingModel->getAll($category, null, $state, $city, $perPage, $offset);
+$totalPostings = $postingModel->getTotalCount($category, null, $state, $city);
 
 // Get posting count for this category (without other filters)
 $countSql = "SELECT COUNT(*) as count FROM postings WHERE category = ? AND status = 'active'";
@@ -310,12 +316,22 @@ $db->close();
                                 <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn">
                                     <i class="fas fa-phone"></i> Call
                                 </a>
+                                <a href="https://t.me/+<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="telegram-btn" target="_blank">
+                                    <i class="fab fa-telegram"></i> Telegram
+                                </a>
                             </div>
                         </div>
                     </div>
                     <?php endforeach; ?>
-                </div>
-            <?php else: ?>
+                    </div>
+
+                    <?php if ($totalPostings > $perPage): ?>
+                        <?php
+                        $queryParams = ['category' => $category];
+                        echo generatePagination($totalPostings, $perPage, $page, 'category.php', $queryParams);
+                        ?>
+                    <?php endif; ?>
+                <?php else: ?>
                 <div class="no-postings" style="text-align: center; padding: 4rem 2rem;">
                     <i class="fas fa-tags" style="font-size: 4rem; color: #64748b; margin-bottom: 1rem;"></i>
                     <h3>No <?php echo strtolower($category); ?> Listings Yet</h3>

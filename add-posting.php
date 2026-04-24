@@ -32,13 +32,14 @@ $schedule_time = '';
 $isEditing = false;
 $postId = null;
 $existingImages = '';
+$isPatching = false;
+$patchSource = null;
 
 // Check if editing an existing post
 if (isset($_GET['id'])) {
     $postId = (int)$_GET['id'];
-    // Assuming getPosting() exists in your Posting model
     $postData = $postingModel->findById($postId);
-    
+
     if ($postData && ($postData['user_id'] == $_SESSION['user_id'] || isAdmin())) {
         $isEditing = true;
         $title = $postData['title'];
@@ -48,10 +49,51 @@ if (isset($_GET['id'])) {
         $state = $postData['state'];
         $city = $postData['city'];
         $contact = $postData['contact'];
-        $publish = $postData['publish'];
-        $schedule_date = $postData['schedule_date'];
-        $schedule_time = $postData['schedule_time'];
+        $publish = isset($postData['publish']) ? $postData['publish'] : 'immediately';
+        $schedule_date = isset($postData['schedule_date']) ? $postData['schedule_date'] : '';
+        $schedule_time = isset($postData['schedule_time']) ? $postData['schedule_time'] : '';
         $existingImages = $postData['images'];
+    }
+}
+// Check if patching from an existing post (to create new post with similar details)
+elseif (isset($_GET['patch_id'])) {
+    $patchId = (int)$_GET['patch_id'];
+    $patchData = $postingModel->findById($patchId);
+
+    if ($patchData && $patchData['status'] == 'active') {
+        $isPatching = true;
+        $patchSource = $patchId;
+        $title = $patchData['title'];
+        $description = $patchData['description'];
+        $category = $patchData['category'];
+        $price = $patchData['price'];
+        $state = $patchData['state'];
+        $city = $patchData['city'];
+        $contact = $patchData['contact'];
+        $publish = isset($patchData['publish']) ? $patchData['publish'] : 'immediately';
+        $schedule_date = isset($patchData['schedule_date']) ? $patchData['schedule_date'] : '';
+        $schedule_time = isset($patchData['schedule_time']) ? $patchData['schedule_time'] : '';
+        // Don't copy images for new post
+        $existingImages = '';
+    }
+}
+// If not editing or patching, but user is logged in, pre-fill with their latest post
+elseif (isLoggedIn()) {
+    $userPosts = $postingModel->findByUserId($_SESSION['user_id']);
+    if (!empty($userPosts)) {
+        $latestPost = $userPosts[0]; // Most recent post
+        $title = $latestPost['title'];
+        $description = $latestPost['description'];
+        $category = $latestPost['category'];
+        $price = $latestPost['price'];
+        $state = $latestPost['state'];
+        $city = $latestPost['city'];
+        $contact = $latestPost['contact'];
+        $publish = isset($latestPost['publish']) ? $latestPost['publish'] : 'immediately';
+        $schedule_date = isset($latestPost['schedule_date']) ? $latestPost['schedule_date'] : '';
+        $schedule_time = isset($latestPost['schedule_time']) ? $latestPost['schedule_time'] : '';
+        // Don't copy images for new post
+        $existingImages = '';
     }
 }
 
@@ -193,7 +235,7 @@ if (isset($_GET['id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $isEditing ? 'Edit Post' : 'Create New Post'; ?> - <?php echo APP_NAME; ?></title>
+    <title><?php echo $isEditing ? 'Edit Post' : ($isPatching ? 'Create Similar Post' : 'Create New Post'); ?> - <?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -572,8 +614,8 @@ if (isset($_GET['id'])) {
     <div class="post-create-container">
         <!-- Editor Panel -->
         <div class="editor-panel">
-<h1 style="font-size: 28px; font-weight: 700; margin-bottom: 12px; color: #dc3545;"><?php echo $isEditing ? 'Edit Post' : 'Create New Post'; ?></h1>
-                        <p style="color: #a0aec0; margin-bottom: 32px;"><?php echo $isEditing ? 'Update your listing details below.' : 'Draft your next story and share it with the community.'; ?></p>
+<h1 style="font-size: 28px; font-weight: 700; margin-bottom: 12px; color: #dc3545;"><?php echo $isEditing ? 'Edit Post' : ($isPatching ? 'Create Similar Post' : 'Create New Post'); ?></h1>
+                        <p style="color: #a0aec0; margin-bottom: 32px;"><?php echo $isEditing ? 'Update your listing details below.' : ($isPatching ? 'Create a new post based on the selected listing.' : 'Draft your next story and share it with the community.'); ?></p>
 
             <?php if (!empty($errors)): ?>
                 <div class="alert alert-danger">
@@ -591,7 +633,7 @@ if (isset($_GET['id'])) {
             <?php endif; ?>
             
             <?php if (empty($success)): ?>
-                <form method="POST" action="addposting.php<?php echo $isEditing ? '?id=' . $postId : ''; ?>" enctype="multipart/form-data">
+                <form method="POST" action="add-posting.php<?php echo $isEditing ? '?id=' . $postId : ($isPatching ? '?patch_id=' . $patchSource : ''); ?>" enctype="multipart/form-data">
                     <div class="form-section">
                         <label for="title">Post Title</label>
                         <input type="text" id="title" name="title" class="title-input" required placeholder="Enter a catchy title..." value="<?php echo htmlspecialchars($title); ?>">
@@ -747,7 +789,7 @@ if (isset($_GET['id'])) {
 
                     <button type="submit" class="publish-btn">
                         <i class="fas fa-paper-plane"></i>
-                        <?php echo $isEditing ? 'Update Post' : 'Publish Post'; ?>
+                        <?php echo $isEditing ? 'Update Post' : ($isPatching ? 'Create Similar Post' : 'Publish Post'); ?>
                     </button>
 </form>
 <?php endif; ?>
@@ -765,8 +807,12 @@ if (isset($_GET['id'])) {
 
                 <div class="tip-card">
                     <h3>Pro Tip</h3>
+                    <?php if ($isPatching): ?>
+                    <p>When creating a similar post, review all details to ensure they match your new listing. Update the title, price, and contact information as needed.</p>
+                    <?php else: ?>
                     <p>Use clear and descriptive titles to attract more viewers. High-quality images can also increase engagement!</p>
                     <a href="#" class="learn-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                    <?php endif; ?>
                 </div>
             </div>                 
     </div>

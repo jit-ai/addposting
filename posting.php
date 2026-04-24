@@ -426,6 +426,24 @@ $author = $userModel->findById($posting['user_id']);
             background: #334155;
         }
 
+        .create-similar-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .create-similar-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .telegram-btn {
+            background: #0088cc;
+            color: white;
+        }
+
+        .telegram-btn:hover {
+            background: #006699;
+        }
+
         .save-btn {
             background: #f1f5f9;
             color: #64748b;
@@ -518,12 +536,15 @@ $author = $userModel->findById($posting['user_id']);
                         <i class="fas fa-phone"></i> <?php echo $posting['contact']; ?>
                     </div>
 
-                   <div class="posting-actions">
+                               <div class="posting-actions">
                                 <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="whatsapp-btn" target="_blank">
                                     <i class="fab fa-whatsapp"></i> WhatsApp
                                 </a>
                                 <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn" target="_blank">
                                     <i class="fas fa-phone"></i> Call Now
+                                </a>
+                                <a href="https://t.me/+<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="telegram-btn" target="_blank">
+                                    <i class="fab fa-telegram"></i> Telegram
                                 </a>
                             </div>
 

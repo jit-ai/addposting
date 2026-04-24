@@ -110,7 +110,74 @@ function sendEmail($to, $subject, $message) {
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     $headers .= "From: " . APP_NAME . " <no-reply@" . $_SERVER['HTTP_HOST'] . ">" . "\r\n";
-    
+
     return mail($to, $subject, $message, $headers);
+}
+
+// Generate pagination HTML
+function generatePagination($totalItems, $itemsPerPage, $currentPage, $baseUrl = '', $queryParams = []) {
+    if ($totalItems <= $itemsPerPage) {
+        return '';
+    }
+
+    $totalPages = ceil($totalItems / $itemsPerPage);
+    $html = '<div class="pagination">';
+
+    // Previous button
+    if ($currentPage > 1) {
+        $prevUrl = buildPaginationUrl($baseUrl, $queryParams, $currentPage - 1);
+        $html .= '<a href="' . $prevUrl . '" class="pagination-link pagination-prev"><i class="fas fa-chevron-left"></i> Previous</a>';
+    } else {
+        $html .= '<span class="pagination-link pagination-prev disabled"><i class="fas fa-chevron-left"></i> Previous</span>';
+    }
+
+    // Page numbers
+    $startPage = max(1, $currentPage - 2);
+    $endPage = min($totalPages, $currentPage + 2);
+
+    // Show first page if not in range
+    if ($startPage > 1) {
+        $firstUrl = buildPaginationUrl($baseUrl, $queryParams, 1);
+        $html .= '<a href="' . $firstUrl . '" class="pagination-link">1</a>';
+        if ($startPage > 2) {
+            $html .= '<span class="pagination-ellipsis">...</span>';
+        }
+    }
+
+    // Page number links
+    for ($i = $startPage; $i <= $endPage; $i++) {
+        if ($i == $currentPage) {
+            $html .= '<span class="pagination-link pagination-current">' . $i . '</span>';
+        } else {
+            $pageUrl = buildPaginationUrl($baseUrl, $queryParams, $i);
+            $html .= '<a href="' . $pageUrl . '" class="pagination-link">' . $i . '</a>';
+        }
+    }
+
+    // Show last page if not in range
+    if ($endPage < $totalPages) {
+        if ($endPage < $totalPages - 1) {
+            $html .= '<span class="pagination-ellipsis">...</span>';
+        }
+        $lastUrl = buildPaginationUrl($baseUrl, $queryParams, $totalPages);
+        $html .= '<a href="' . $lastUrl . '" class="pagination-link">' . $totalPages . '</a>';
+    }
+
+    // Next button
+    if ($currentPage < $totalPages) {
+        $nextUrl = buildPaginationUrl($baseUrl, $queryParams, $currentPage + 1);
+        $html .= '<a href="' . $nextUrl . '" class="pagination-link pagination-next">Next <i class="fas fa-chevron-right"></i></a>';
+    } else {
+        $html .= '<span class="pagination-link pagination-next disabled">Next <i class="fas fa-chevron-right"></i></span>';
+    }
+
+    $html .= '</div>';
+    return $html;
+}
+
+// Helper function to build pagination URLs
+function buildPaginationUrl($baseUrl, $queryParams, $page) {
+    $params = array_merge($queryParams, ['page' => $page]);
+    return $baseUrl . '?' . http_build_query($params);
 }
 ?>

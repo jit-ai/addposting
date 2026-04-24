@@ -1,6 +1,8 @@
 <?php
+session_start();
 require_once 'includes/functions.php';
 require_once 'includes/Posting.php';
+require_once 'includes/database.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {
@@ -13,40 +15,62 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 
 $postingModel = new Posting();
+$errors = [];
+$success = '';
 
-// Get posting details
-$posting = $postingModel->findById($_GET['id']);
+// Get active categories from database
+$db = new Database();
+$conn = $db->getConnection();
+$activeCategories = $conn->query("SELECT name FROM categories WHERE status = 'active' ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
+
+// Initialize variables with default values
+$title = '';
+$description = '';
+$category = '';
+$price = '';
+$state = '';
+$city = '';
+$contact = '';
+$status = 'active';
+$isEditing = true;
+$postId = null;
+$existingImages = '';
+
+// Check if posting ID is provided
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    redirect('my-postings.php');
+}
+
+$postId = (int)$_GET['id'];
+$posting = $postingModel->findById($postId);
 
 if (!$posting || $posting['user_id'] != $_SESSION['user_id']) {
     redirect('404.php');
 }
 
-// Handle form submission
-$errors = [];
-$success = '';
+// Pre-fill form with existing data
+$title = $posting['title'];
+$description = $posting['description'];
+$category = $posting['category'];
+$price = $posting['price'];
+$state = $posting['state'];
+$city = $posting['city'];
+$contact = $posting['contact'];
+$status = $posting['status'];
+$existingImages = $posting['images'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate input
     $title = sanitize($_POST['title']);
     $description = sanitize($_POST['description']);
     $category = sanitize($_POST['category']);
-    $price = (float)$_POST['price'];
-    $location = sanitize($_POST['location']);
-    $contact = sanitize($_POST['contact']);
+    // Fix for "Column 'price' cannot be null"
+    $price = (isset($_POST['price']) && $_POST['price'] !== '') ? (float)$_POST['price'] : 0.0;
+    $state = sanitize($_POST['state']);
+    $city = sanitize($_POST['city']);
+    $contact = preg_replace('/[^0-9]/', '', sanitize($_POST['contact']));
     $status = sanitize($_POST['status']);
-    
-    // Logic to handle existing images vs removed images
     $images = [];
-    if (!empty($posting['images'])) {
-        $existingImages = explode(',', $posting['images']);
-        $removedIndices = isset($_POST['remove_images']) ? $_POST['remove_images'] : [];
-        
-        foreach ($existingImages as $index => $imgName) {
-            if (!in_array($index, $removedIndices)) {
-                $images[] = $imgName;
-            }
-        }
-    }
 
     if (empty($title)) {
         $errors[] = 'Title is required';
@@ -62,62 +86,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Category is required';
     }
 
-    // Price is optional
-    if (!empty($price) && $price < 0) {
-        $errors[] = 'Price cannot be negative';
+    if (empty($state)) {
+        $errors[] = 'State is required';
     }
 
-    if (empty($location)) {
-        $errors[] = 'Location is required';
+    if (empty($city)) {
+        $errors[] = 'City is required';
     }
 
     if (empty($contact)) {
         $errors[] = 'Contact information is required';
     }
 
-    // Handle new image uploads
+    // Handle image uploads
     if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
         foreach ($_FILES['images']['tmp_name'] as $key => $tmpName) {
-            if ($_FILES['images']['error'][$key] === UPLOAD_ERR_OK) {
-                $file = [
-                    'name' => $_FILES['images']['name'][$key],
-                    'type' => $_FILES['images']['type'][$key],
-                    'tmp_name' => $tmpName,
-                    'error' => $_FILES['images']['error'][$key],
-                    'size' => $_FILES['images']['size'][$key]
-                ];
-                
-                $uploadResult = uploadFile($file, 'postings/');
-                
-                if (isset($uploadResult['error'])) {
-                    $errors[] = $uploadResult['error'];
-                } else {
-                    $images[] = $uploadResult['success'];
-                }
+            $file = [
+                'name' => $_FILES['images']['name'][$key],
+                'type' => $_FILES['images']['type'][$key],
+                'tmp_name' => $tmpName,
+                'error' => $_FILES['images']['error'][$key],
+                'size' => $_FILES['images']['size'][$key]
+            ];
+
+            $uploadResult = uploadFile($file, 'postings/');
+
+            if (isset($uploadResult['error'])) {
+                $errors[] = $uploadResult['error'];
+            } else {
+                $images[] = $uploadResult['success'];
             }
         }
     }
 
     // If no errors, update posting
     if (empty($errors)) {
-        $updateData = [
+        $data = [
             'title' => $title,
             'description' => $description,
             'category' => $category,
             'price' => $price,
-            'location' => $location,
+            'state' => $state,
+            'city' => $city,
             'contact' => $contact,
-            'status' => $status,
-            'images' => implode(',', $images),
-            'scheduled_at' => $posting['scheduled_at'] // Preserve scheduling if exists
+            'status' => $status
         ];
 
-        if ($postingModel->update($_GET['id'], $updateData)) {
-            $success = 'Posting updated successfully!';
-            // Refresh posting data
-            $posting = $postingModel->findById($_GET['id']);
+        // Handle Images logic
+        if (empty($images) && !empty($existingImages)) {
+            $data['images'] = $existingImages;
         } else {
-            $errors[] = 'Failed to update posting. Please try again.';
+            $data['images'] = implode(',', $images);
+        }
+
+        if ($postingModel->update($postId, $data)) {
+            $success = 'Posting updated successfully!';
+        } else {
+            $errors[] = 'Failed to update posting.';
         }
     }
 }
@@ -142,10 +167,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .editor-panel {
-            background: white;
+            background: #1e1e1e;
             border-radius: 12px;
             padding: 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #333;
         }
 
         .sidebar-panel {
@@ -154,44 +180,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 20px;
         }
 
+        .publish-card,
+        .settings-card,
         .tip-card {
-            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-            color: white;
+            background: #1e1e1e;
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .form-section {
-            margin-bottom: 32px;
-        }
-
-        .form-section label {
-            display: block;
+        .publish-card h3,
+        .settings-card h3 {
             font-size: 14px;
             font-weight: 600;
-            color: #111827;
-            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .form-section input[type="text"],
-        .form-section input[type="number"],
-        .form-section textarea,
-        .form-section select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-
-        .form-section textarea {
-            min-height: 200px;
-            resize: vertical;
-            font-family: inherit;
+            color: #6b7280;
+            margin-bottom: 16px;
         }
 
         .publish-btn {
@@ -209,6 +214,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             justify-content: center;
             gap: 8px;
             transition: background 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .publish-btn:hover {
+            background: #374151;
+        }
+
+        .trash-link {
+            color: #ef4444;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 0;
+            transition: color 0.2s;
+        }
+
+        .trash-link:hover {
+            color: #dc2626;
+            text-decoration: underline;
+        }
+
+        .last-saved {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 12px;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .form-row .form-section {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-section label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-section input[type="text"],
+        .form-section input[type="number"],
+        .form-section input[type="date"],
+        .form-section input[type="time"],
+        .form-section textarea,
+        .form-section select {
+                width: 100%;
+                padding: 0.75rem;
+                border: 1px solid #444;
+                border-radius: 8px;
+                font-size: 1rem;
+                background: #2a2a2a;
+                color: #f0f0f0;
+        }
+
+        .form-section input[type="text"]:focus,
+        .form-section input[type="number"]:focus,
+        .form-section input[type="date"]:focus,
+        .form-section input[type="time"]:focus,
+        .form-section textarea:focus,
+        .form-section select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-section textarea {
+            min-height: 200px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .title-input {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            padding: 16px;
         }
 
         .featured-image {
@@ -218,15 +314,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 10px;
+        }
+
+        .featured-image:hover {
+            border-color: #667eea;
+            background: #2a2a2a;
+        }
+
+        .featured-image i {
+            font-size: 48px;
+            color: #9ca3af;
+            margin-bottom: 12px;
+        }
+
+        .featured-image p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .featured-image input[type="file"] {
+            display: none;
         }
 
         .editor-toolbar {
             display: flex;
             gap: 4px;
             padding: 8px 16px;
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
+            background: #2a2a2a;
+            border: 2px solid #2a2a2a;
             border-bottom: none;
             border-radius: 8px 8px 0 0;
         }
@@ -237,49 +352,117 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 6px 8px;
             cursor: pointer;
             border-radius: 4px;
+            transition: background 0.2s;
+            color: #fff;
         }
 
-        /* Existing Image Styles */
-        .existing-images {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 15px;
+        .editor-toolbar button:hover {
+            background: #2a2a2a;
+        }
+
+        .settings-card .form-group {
             margin-bottom: 20px;
         }
-        
-        .existing-image-item {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            aspect-ratio: 1;
+
+        .settings-card label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
         }
-        
-        .existing-image-item img {
+
+        .settings-card select,
+        .settings-card input[type="text"] {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
         }
-        
-        .remove-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(220, 53, 69, 0.9);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
+
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            min-height: 44px;
+        }
+
+        .tag {
+            background: #2a2a2a;
+            color: #374151;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s;
+            gap: 4px;
         }
-        
-        .remove-btn:hover {
-            background: #c82333;
+
+        .tag-remove {
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .tag-remove:hover {
+            color: #dc2626;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+        }
+
+        .tip-card h3 {
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .tip-card p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .tip-card .learn-more {
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tip-card .learn-more:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .post-create-container {
+                grid-template-columns: 1fr;
+            }
         }
 
         .alert {
@@ -299,47 +482,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #bbf7d0;
             color: #166534;
         }
+
+        .alert p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
     </style>
 </head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <div class="logo">
-                <i class="fas fa-store"></i>
-                <h1><?php echo APP_NAME; ?></h1>
-            </div>
-            <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
-                <i class="fas fa-bars"></i>
-            </button>
-            <nav>
-                <ul>
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="addposting.php">Add Posting</a></li>
-                    <?php if (isLoggedIn()): ?>
-                        <li class="dropdown">
-                            <a href="#"><i class="fas fa-user"></i> My Account</a>
-                            <div class="dropdown-content">
-                                <a href="dashboard.php">Dashboard</a>
-                                <a href="my-postings.php">My Postings</a>
-                                <a href="profile.php">Profile</a>
-                                <a href="logout.php">Logout</a>
-                            </div>
-                        </li>
-                    <?php else: ?>
-                        <li><a href="login.php">Login</a></li>
-                        <li><a href="register.php">Register</a></li>
-                    <?php endif; ?>
-                    <?php if (isAdmin()): ?>
-                        <li><a href="admin/dashboard.php" class="btn btn-danger">Admin Dashboard</a></li>
-                    <?php endif; ?>
-                </ul>
-            </nav>
-        </div>
-    </header>
-    
-    <!-- Mobile Navigation -->
-    <div class="mobile-nav-overlay"></div>
+<body class="auth-body">
+    <?php include 'includes/header.php'; ?>
+
+    <!-- Editor Panel -->
     <div class="mobile-nav">
         <div class="mobile-nav-header">
             <div class="logo">
@@ -350,85 +504,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <?php if (isLoggedIn()): ?>
-        <div class="mobile-nav-user">
-            <i class="fas fa-user-circle"></i> My Account
-        </div>
-        <?php endif; ?>
-        <ul>
-            <li><a href="index.php"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
-            <?php if (isLoggedIn()): ?>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>
-                    <div class="dropdown-content">
-                        <a href="dashboard.php">Dashboard</a>
-                        <a href="my-postings.php">My Postings</a>
-                        <a href="profile.php">Profile</a>
-                        <a href="logout.php">Logout</a>
-                    </div>
-                </li>
-            <?php else: ?>
-                <li><a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-                <li><a href="register.php"><i class="fas fa-user-plus"></i> Register</a></li>
-            <?php endif; ?>
-            <?php if (isAdmin()): ?>
-                <li><a href="admin/dashboard.php"><i class="fas fa-cog"></i> Admin Dashboard</a></li>
-            <?php endif; ?>
-        </ul>
     </div>
 
-    <!-- Edit Posting -->
+    <!-- Post Create Section -->
     <div class="post-create-container">
+        <!-- Editor Panel -->
         <div class="editor-panel">
-            <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 12px;">Edit Posting</h1>
-            <p style="color: #6b7280; margin-bottom: 32px;">Update your listing details below.</p>
+<h1 style="font-size: 28px; font-weight: 700; margin-bottom: 12px; color: #dc3545;">Edit Post</h1>
+                        <p style="color: #a0aec0; margin-bottom: 32px;">Update your listing details below.</p>
 
-                <?php if (!empty($errors)): ?>
-                    <div class="alert alert-danger">
-                        <?php foreach ($errors as $error): ?>
-                            <p><?php echo $error; ?></p>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (!empty($success)): ?>
-                    <div class="alert alert-success">
-                        <p><?php echo $success; ?></p>
-                        <p><a href="my-postings.php" class="btn btn-primary" style="margin-top: 10px; display: inline-block;">View My Postings</a></p>
-                    </div>
-                <?php endif; ?>
+            <?php if (!empty($errors)): ?>
+                <div class="alert alert-danger">
+                    <?php foreach ($errors as $error): ?>
+                        <p><?php echo $error; ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
 
-                <form method="POST" action="edit-posting.php?id=<?php echo $_GET['id']; ?>" enctype="multipart/form-data">
+            <?php if (!empty($success)): ?>
+                <div class="alert alert-success">
+                    <p><?php echo $success; ?></p>
+                    <p><a href="my-postings.php" class="btn btn-primary">View My Postings</a></p>
+                </div>
+            <?php endif; ?>
+
+            <?php if (empty($success)): ?>
+                <form method="POST" action="edit-posting.php?id=<?php echo $postId; ?>" enctype="multipart/form-data">
                     <div class="form-section">
-                        <label for="title">Title</label>
-                        <input type="text" id="title" name="title" required placeholder="Enter item title" value="<?php echo htmlspecialchars(isset($_POST['title']) ? $_POST['title'] : $posting['title']); ?>">
-                    </div>
-                    
-                    <div class="form-section">
-                        <label>Existing Images</label>
-                        <?php if (!empty($posting['images'])): ?>
-                            <div class="existing-images">
-                                <?php foreach (explode(',', $posting['images']) as $key => $image): ?>
-                                    <div class="existing-image-item">
-                                        <img src="uploads/postings/<?php echo $image; ?>" alt="Image <?php echo $key + 1; ?>">
-                                        <button type="button" class="remove-btn" data-index="<?php echo $key; ?>" title="Remove Image">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php else: ?>
-                            <p style="color: #6b7280; font-style: italic;">No existing images</p>
-                        <?php endif; ?>
+                        <label for="title">Post Title</label>
+                        <input type="text" id="title" name="title" class="title-input" required placeholder="Enter a catchy title..." value="<?php echo htmlspecialchars($title); ?>">
                     </div>
 
                     <div class="form-section">
-                        <label for="images">Add New Images</label>
+                        <label for="images">Featured Image</label>
                         <div class="featured-image">
-                            <input type="file" id="images" name="images[]" multiple accept="image/*" style="display: none;">
-                            <label for="images" style="cursor: pointer;">
-                                <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #9ca3af; margin-bottom: 12px;"></i>
+                            <input type="file" id="images" name="images[]" multiple accept="image/*">
+                            <label for="images">
+                                <i class="fas fa-cloud-upload-alt"></i>
                                 <p>Click to upload or drag and drop</p>
                                 <p style="font-size: 12px; color: #9ca3af; margin-top: 4px;">PNG, JPG, GIF up to 5MB</p>
                             </label>
@@ -446,94 +558,251 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button type="button"><i class="fas fa-image"></i></button>
                             <button type="button"><i class="fas fa-code"></i></button>
                         </div>
-                        <textarea id="description" name="description" required placeholder="Enter item description"><?php echo htmlspecialchars(isset($_POST['description']) ? $_POST['description'] : $posting['description']); ?></textarea>
+                        <textarea id="description" name="description" required placeholder="Write your story here..."><?php echo htmlspecialchars($description); ?></textarea>
                     </div>
 
                     <div class="form-section">
                         <label for="category">Category</label>
                         <select id="category" name="category" required>
                             <option value="">Select a category</option>
-                            <?php
-                            $cats = ['Electronics', 'Furniture', 'Vehicles', 'Real Estate', 'Jobs', 'Services', 'Clothing', 'Books', 'Sports', 'Other'];
-                            $currentCat = isset($_POST['category']) ? $_POST['category'] : $posting['category'];
-                            foreach($cats as $cat) {
-                                $selected = $currentCat === $cat ? 'selected' : '';
-                                echo "<option value=\"$cat\" $selected>$cat</option>";
-                            }
-                            ?>
+                            <?php foreach ($activeCategories as $cat): ?>
+                            <option value="<?php echo $cat['name']; ?>" <?php echo $category === $cat['name'] ? 'selected' : ''; ?>><?php echo $cat['name']; ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
-                    
+
                     <div class="form-section">
                         <label for="price">Price (₹)</label>
-                        <input type="number" id="price" name="price" step="0.01" min="0" placeholder="Enter price" value="<?php echo isset($_POST['price']) ? $_POST['price'] : $posting['price']; ?>">
+                        <input type="number" id="price" name="price" step="0.01" min="0" placeholder="Enter price" value="<?php echo $price !== '' ? htmlspecialchars($price) : ''; ?>">
                     </div>
-                    
+
+
+
                     <div class="form-section">
-                        <label for="location">Location</label>
-                        <input type="text" id="location" name="location" required placeholder="Enter location" value="<?php echo htmlspecialchars(isset($_POST['location']) ? $_POST['location'] : $posting['location']); ?>">
+                        <label for="state">State</label>
+                        <select id="state" name="state" required onchange="loadCities(this.value)" style="width: 100%; padding: 0.75rem; border: 1px solid #444; border-radius: 8px; font-size: 1rem; background: #2a2a2a; color: #f0f0f0;">
+                            <option value="">Select a state</option>
+                            <option value="Andhra Pradesh" <?php echo $state === 'Andhra Pradesh' ? 'selected' : ''; ?>>Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh" <?php echo $state === 'Arunachal Pradesh' ? 'selected' : ''; ?>>Arunachal Pradesh</option>
+                            <option value="Assam" <?php echo $state === 'Assam' ? 'selected' : ''; ?>>Assam</option>
+                            <option value="Bihar" <?php echo $state === 'Bihar' ? 'selected' : ''; ?>>Bihar</option>
+                            <option value="Chhattisgarh" <?php echo $state === 'Chhattisgarh' ? 'selected' : ''; ?>>Chhattisgarh</option>
+                            <option value="Goa" <?php echo $state === 'Goa' ? 'selected' : ''; ?>>Goa</option>
+                            <option value="Gujarat" <?php echo $state === 'Gujarat' ? 'selected' : ''; ?>>Gujarat</option>
+                            <option value="Haryana" <?php echo $state === 'Haryana' ? 'selected' : ''; ?>>Haryana</option>
+                            <option value="Himachal Pradesh" <?php echo $state === 'Himachal Pradesh' ? 'selected' : ''; ?>>Himachal Pradesh</option>
+                            <option value="Jharkhand" <?php echo $state === 'Jharkhand' ? 'selected' : ''; ?>>Jharkhand</option>
+                            <option value="Karnataka" <?php echo $state === 'Karnataka' ? 'selected' : ''; ?>>Karnataka</option>
+                            <option value="Kerala" <?php echo $state === 'Kerala' ? 'selected' : ''; ?>>Kerala</option>
+                            <option value="Madhya Pradesh" <?php echo $state === 'Madhya Pradesh' ? 'selected' : ''; ?>>Madhya Pradesh</option>
+                            <option value="Maharashtra" <?php echo $state === 'Maharashtra' ? 'selected' : ''; ?>>Maharashtra</option>
+                            <option value="Manipur" <?php echo $state === 'Manipur' ? 'selected' : ''; ?>>Manipur</option>
+                            <option value="Meghalaya" <?php echo $state === 'Meghalaya' ? 'selected' : ''; ?>>Meghalaya</option>
+                            <option value="Mizoram" <?php echo $state === 'Mizoram' ? 'selected' : ''; ?>>Mizoram</option>
+                            <option value="Nagaland" <?php echo $state === 'Nagaland' ? 'selected' : ''; ?>>Nagaland</option>
+                            <option value="Odisha" <?php echo $state === 'Odisha' ? 'selected' : ''; ?>>Odisha</option>
+                            <option value="Punjab" <?php echo $state === 'Punjab' ? 'selected' : ''; ?>>Punjab</option>
+                            <option value="Rajasthan" <?php echo $state === 'Rajasthan' ? 'selected' : ''; ?>>Rajasthan</option>
+                            <option value="Sikkim" <?php echo $state === 'Sikkim' ? 'selected' : ''; ?>>Sikkim</option>
+                            <option value="Tamil Nadu" <?php echo $state === 'Tamil Nadu' ? 'selected' : ''; ?>>Tamil Nadu</option>
+                            <option value="Telangana" <?php echo $state === 'Telangana' ? 'selected' : ''; ?>>Telangana</option>
+                            <option value="Tripura" <?php echo $state === 'Tripura' ? 'selected' : ''; ?>>Tripura</option>
+                            <option value="Uttar Pradesh" <?php echo $state === 'Uttar Pradesh' ? 'selected' : ''; ?>>Uttar Pradesh</option>
+                            <option value="Uttarakhand" <?php echo $state === 'Uttarakhand' ? 'selected' : ''; ?>>Uttarakhand</option>
+                            <option value="West Bengal" <?php echo $state === 'West Bengal' ? 'selected' : ''; ?>>West Bengal</option>
+                            <option value="Delhi" <?php echo $state === 'Delhi' ? 'selected' : ''; ?>>Delhi</option>
+                        </select>
                     </div>
-                    
+
+                    <div class="form-section">
+                        <label for="city">City</label>
+                        <select id="city" name="city" required style="width: 100%; padding: 0.75rem; border: 1px solid #444; border-radius: 8px; font-size: 1rem; background: #2a2a2a; color: #f0f0f0;">
+                            <option value="">Select a city</option>
+                            <?php if (!empty($state)): ?>
+                                <?php
+                                $citiesByState = [
+                                    'Andhra Pradesh' => ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Tirupati', 'Nellore', 'Kakinada', 'Rajahmundry', 'Kadapa', 'Kurnool', 'Anantapur'],
+                                    'Arunachal Pradesh' => ['Itanagar', 'Naharlagun', 'Pasighat', 'Tezpur', 'Dibang Valley', 'Roing', 'Ziro', 'Bomdila'],
+                                    'Assam' => ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Nagaon', 'Tinsukia', 'Tezpur', 'Bongaigaon'],
+                                    'Bihar' => ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Darbhanga', 'Arrah', 'Begusarai', 'Katihar', 'Munger', 'Purnia'],
+                                    'Chhattisgarh' => ['Raipur', 'Bhilai', 'Bilaspur', 'Durg', 'Rajnandgaon', 'Korba', 'Raigarh', 'Mahasamund'],
+                                    'Goa' => ['Panaji', 'Margao', 'Vasco da Gama', 'Mapusa', 'Ponda', 'Curchorem', 'Benaulim'],
+                                    'Gujarat' => ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar', 'Junagadh', 'Gandhidham', 'Anand', 'Bharuch'],
+                                    'Haryana' => ['Faridabad', 'Gurgaon', 'Panipat', 'Karnal', 'Rohtak', 'Hisar', 'Sonipat', 'Ambala', 'Yamunanagar', 'Kurukshetra'],
+                                    'Himachal Pradesh' => ['Shimla', 'Mandi', 'Solan', 'Kullu', 'Manali', 'Dharamshala', 'Kangra', 'Chamba', 'Bilaspur'],
+                                    'Jharkhand' => ['Ranchi', 'Jamshedpur', 'Dhanbad', 'Bokaro Steel City', 'Hazaribagh', 'Deoghar', 'Ramgarh', 'Giridih'],
+                                    'Karnataka' => ['Bengaluru', 'Mysore', 'Mangalore', 'Hubli-Dharwad', 'Belgaum', 'Gulbarga', 'Dharwad', 'Udupi', 'Hassan', 'Bellary'],
+                                    'Kerala' => ['Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur', 'Kollam', 'Palakkad', 'Alappuzha', 'Kannur', 'Kottayam', 'Ernakulam'],
+                                    'Madhya Pradesh' => ['Bhopal', 'Indore', 'Gwalior', 'Jabalpur', 'Ujjain', 'Sagar', 'Ratlam', 'Satna', 'Burhanpur', 'Khandwa'],
+                                    'Maharashtra' => ['Mumbai', 'Pune', 'Nagpur', 'Thane', 'Nashik', 'Aurangabad', 'Solapur', 'Kolhapur', 'Navi Mumbai', 'Sangli'],
+                                    'Manipur' => ['Imphal', 'Thoubal', 'Bishnupur', 'Churachandpur', 'Ukhrul', 'Tamenglong', 'Senapati'],
+                                    'Meghalaya' => ['Shillong', 'Tura', 'Nongstoin', 'Jowai', 'Baghmara', 'Williamnagar', 'Mawkyrwat'],
+                                    'Mizoram' => ['Aizawl', 'Lunglei', 'Champhai', 'Serchhip', 'Kolasib', 'Mamit', 'Saitual'],
+                                    'Nagaland' => ['Kohima', 'Dimapur', 'Mokokchung', 'Wokha', 'Tuensang', 'Phek', 'Zunheboto'],
+                                    'Odisha' => ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Berhampur', 'Sambalpur', 'Balasore', 'Bhadrak', 'Angul', 'Jharsuguda', 'Puri'],
+                                    'Punjab' => ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda', 'Mohali', 'Hoshiarpur', 'Kapurthala', 'Ferozepur', 'Moga'],
+                                    'Rajasthan' => ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer', 'Pilani', 'Bhilwara', 'Alwar', 'Bharatpur'],
+                                    'Sikkim' => ['Gangtok', 'Namchi', 'Gyalshing', 'Rabong', 'Soreng', 'Jorethang', 'Mangan'],
+                                    'Tamil Nadu' => ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tiruppur', 'Vellore', 'Erode', 'Tirunelveli', 'Thanjavur'],
+                                    'Telangana' => ['Hyderabad', 'Warangal', 'Karimnagar', 'Khammam', 'Secunderabad', 'Nizamabad', 'Ramagundam', 'Suryapet', 'Miryalguda', 'Kothakota'],
+                                    'Tripura' => ['Agartala', 'Udaipur', 'Dharmanagar', 'Kailasahar', 'Belonia', 'Khowai', 'Sabroom'],
+                                    'Uttar Pradesh' => ['Lucknow', 'Kanpur', 'Ghaziabad', 'Agra', 'Varanasi', 'Allahabad', 'Meerut', 'Aligarh', 'Moradabad', 'Saharanpur'],
+                                    'Uttarakhand' => ['Dehradun', 'Haridwar', 'Roorkee', 'Haldwani', 'Kashipur', 'Rishikesh', 'Rudrapur', 'Kotdwar', 'Ramnagar'],
+                                    'West Bengal' => ['Kolkata', 'Howrah', 'Asansol', 'Siliguri', 'Durgapur', 'Bardhaman', 'Malda', 'Kharagpur', 'Berhampore', 'Baharampur'],
+                                    'Delhi' => ['New Delhi', 'North Delhi', 'South Delhi', 'East Delhi', 'West Delhi', 'Central Delhi', 'Old Delhi']
+                                ];
+                                $cities = $citiesByState[$state] ?? [];
+                                foreach ($cities as $c): ?>
+                                <option value="<?php echo $c; ?>" <?php echo $city === $c ? 'selected' : ''; ?>><?php echo $c; ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+
                     <div class="form-section">
                         <label for="contact">Contact Information</label>
-                        <input type="text" id="contact" name="contact" required placeholder="Enter phone number or email" value="<?php echo htmlspecialchars(isset($_POST['contact']) ? $_POST['contact'] : $posting['contact']); ?>">
+                        <input type="tel" id="contact" name="contact" required placeholder="Enter phone number" value="<?php echo htmlspecialchars($contact); ?>" pattern="[0-9]+" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 100%; padding: 0.75rem; border: 1px solid #444; border-radius: 8px; font-size: 1rem; background: #2a2a2a; color: #f0f0f0; transition: border-color 0.2s;">
                     </div>
-                    
+
                     <div class="form-section">
                         <label for="status">Status</label>
                         <select id="status" name="status" required>
-                            <option value="active" <?php echo (isset($_POST['status']) ? $_POST['status'] : $posting['status']) === 'active' ? 'selected' : ''; ?>>Active</option>
-                            <option value="inactive" <?php echo (isset($_POST['status']) ? $_POST['status'] : $posting['status']) === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
+                            <option value="active" <?php echo $status === 'active' ? 'selected' : ''; ?>>Active</option>
+                            <option value="inactive" <?php echo $status === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
                         </select>
                     </div>
-                    
+
                     <button type="submit" class="publish-btn">
                         <i class="fas fa-paper-plane"></i>
                         Update Post
                     </button>
-                </form>
+</form>
+<?php endif; ?>
         </div>
+            <div class="sidebar-panel">
+                <div class="settings-card">
+                    <h3>Post Settings</h3>
+                    <p>Set the category, price, location, and contact information for your post to reach the right audience.</p>
+                </div>
 
-        <!-- Sidebar -->
-        <div class="sidebar-panel">
-            <div class="tip-card">
-                <h3><i class="fas fa-lightbulb"></i> Pro Tip</h3>
-                <p>Keeping your posting status 'Active' ensures it appears in search results. Deactivate it if the item is no longer available.</p>
+                <div class="tip-card">
+                    <h3>Pro Tip</h3>
+                    <p>When editing your post, review all details to ensure they match your current listing. Update the title, price, and contact information as needed. Set status to 'Active' to make it visible to others.</p>
+                </div>
             </div>
-        </div>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 <?php echo APP_NAME; ?>. All rights reserved.</p>
-        </div>
-    </footer>
-
+    <!-- Sidebar Panel -->
+<?php include 'includes/footer.php'; ?>
     <script src="assets/js/main.js?v=<?php echo time(); ?>"></script>
     <script>
-        // Image preview and removal
-        document.addEventListener('DOMContentLoaded', function() {
-            const removeBtns = document.querySelectorAll('.remove-btn');
-            
-            removeBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    if(!confirm('Are you sure you want to remove this image? It will be deleted upon saving.')) return;
-                    const index = this.dataset.index;
-                    const imagePreviewItem = this.closest('.existing-image-item');
-                    
-                    // Add hidden input to indicate image should be removed
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'remove_images[]';
-                    input.value = index;
-                    document.querySelector('form').appendChild(input);
-                    
-                    // Remove preview item
-                    imagePreviewItem.remove();
+        const citiesByState = {
+            'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Tirupati', 'Nellore', 'Kakinada', 'Rajahmundry', 'Kadapa', 'Kurnool', 'Anantapur'],
+            'Arunachal Pradesh': ['Itanagar', 'Naharlagun', 'Pasighat', 'Tezpur', 'Dibang Valley', 'Roing', 'Ziro', 'Bomdila'],
+            'Assam': ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Nagaon', 'Tinsukia', 'Tezpur', 'Bongaigaon'],
+            'Bihar': ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Darbhanga', 'Arrah', 'Begusarai', 'Katihar', 'Munger', 'Purnia'],
+            'Chhattisgarh': ['Raipur', 'Bhilai', 'Bilaspur', 'Durg', 'Rajnandgaon', 'Korba', 'Raigarh', 'Mahasamund'],
+            'Goa': ['Panaji', 'Margao', 'Vasco da Gama', 'Mapusa', 'Ponda', 'Curchorem', 'Benaulim'],
+            'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar', 'Junagadh', 'Gandhidham', 'Anand', 'Bharuch'],
+            'Haryana': ['Faridabad', 'Gurgaon', 'Panipat', 'Karnal', 'Rohtak', 'Hisar', 'Sonipat', 'Ambala', 'Yamunanagar', 'Kurukshetra'],
+            'Himachal Pradesh': ['Shimla', 'Mandi', 'Solan', 'Kullu', 'Manali', 'Dharamshala', 'Kangra', 'Chamba', 'Bilaspur'],
+            'Jharkhand': ['Ranchi', 'Jamshedpur', 'Dhanbad', 'Bokaro Steel City', 'Hazaribagh', 'Deoghar', 'Ramgarh', 'Giridih'],
+            'Karnataka': ['Bengaluru', 'Mysore', 'Mangalore', 'Hubli-Dharwad', 'Belgaum', 'Gulbarga', 'Dharwad', 'Udupi', 'Hassan', 'Bellary'],
+            'Kerala': ['Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur', 'Kollam', 'Palakkad', 'Alappuzha', 'Kannur', 'Kottayam', 'Ernakulam'],
+            'Madhya Pradesh': ['Bhopal', 'Indore', 'Gwalior', 'Jabalpur', 'Ujjain', 'Sagar', 'Ratlam', 'Satna', 'Burhanpur', 'Khandwa'],
+            'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Thane', 'Nashik', 'Aurangabad', 'Solapur', 'Kolhapur', 'Navi Mumbai', 'Sangli'],
+            'Manipur': ['Imphal', 'Thoubal', 'Bishnupur', 'Churachandpur', 'Ukhrul', 'Tamenglong', 'Senapati'],
+            'Meghalaya': ['Shillong', 'Tura', 'Nongstoin', 'Jowai', 'Baghmara', 'Williamnagar', 'Mawkyrwat'],
+            'Mizoram': ['Aizawl', 'Lunglei', 'Champhai', 'Serchhip', 'Kolasib', 'Mamit', 'Saitual'],
+            'Nagaland': ['Kohima', 'Dimapur', 'Mokokchung', 'Wokha', 'Tuensang', 'Phek', 'Zunheboto'],
+            'Odisha': ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Berhampur', 'Sambalpur', 'Balasore', 'Bhadrak', 'Angul', 'Jharsuguda', 'Puri'],
+            'Punjab': ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda', 'Mohali', 'Hoshiarpur', 'Kapurthala', 'Ferozepur', 'Moga'],
+            'Rajasthan': ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer', 'Pilani', 'Bhilwara', 'Alwar', 'Bharatpur'],
+            'Sikkim': ['Gangtok', 'Namchi', 'Gyalshing', 'Rabong', 'Soreng', 'Jorethang', 'Mangan'],
+            'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tiruppur', 'Vellore', 'Erode', 'Tirunelveli', 'Thanjavur'],
+            'Telangana': ['Hyderabad', 'Warangal', 'Karimnagar', 'Khammam', 'Secunderabad', 'Nizamabad', 'Ramagundam', 'Suryapet', 'Miryalguda', 'Kothakota'],
+            'Tripura': ['Agartala', 'Udaipur', 'Dharmanagar', 'Kailasahar', 'Belonia', 'Khowai', 'Sabroom'],
+            'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Ghaziabad', 'Agra', 'Varanasi', 'Allahabad', 'Meerut', 'Aligarh', 'Moradabad', 'Saharanpur'],
+            'Uttarakhand': ['Dehradun', 'Haridwar', 'Roorkee', 'Haldwani', 'Kashipur', 'Rishikesh', 'Rudrapur', 'Kotdwar', 'Ramnagar'],
+            'West Bengal': ['Kolkata', 'Howrah', 'Asansol', 'Siliguri', 'Durgapur', 'Bardhaman', 'Malda', 'Kharagpur', 'Berhampore', 'Baharampur'],
+            'Delhi': ['New Delhi', 'North Delhi', 'South Delhi', 'East Delhi', 'West Delhi', 'Central Delhi', 'Old Delhi']
+        };
+
+        function loadCities(state) {
+            const citySelect = document.getElementById('city');
+            citySelect.innerHTML = '<option value="">Select a city</option>';
+
+            if (state && citiesByState[state]) {
+                citiesByState[state].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
                 });
+            }
+        }
+
+
+
+        // Simple toolbar functionality
+        const toolbarButtons = document.querySelectorAll('.editor-toolbar button');
+        const editor = document.getElementById('description');
+
+        toolbarButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const icon = e.target.closest('button').querySelector('i');
+                const iconClass = icon.className;
+
+                if (iconClass.includes('fa-bold')) {
+                    wrapText('**', '**');
+                } else if (iconClass.includes('fa-italic')) {
+                    wrapText('*', '*');
+                } else if (iconClass.includes('fa-list-ul')) {
+                    addList('unordered');
+                } else if (iconClass.includes('fa-list-ol')) {
+                    addList('ordered');
+                }
             });
         });
+
+        function wrapText(startTag, endTag) {
+            const selectionStart = editor.selectionStart;
+            const selectionEnd = editor.selectionEnd;
+            const text = editor.value;
+
+            const before = text.substring(0, selectionStart);
+            const selected = text.substring(selectionStart, selectionEnd);
+            const after = text.substring(selectionEnd);
+
+            editor.value = before + startTag + selected + endTag + after;
+            editor.focus();
+            editor.setSelectionRange(
+                selectionStart + startTag.length,
+                selectionEnd + startTag.length
+            );
+        }
+
+        function addList(type) {
+            const selectionStart = editor.selectionStart;
+            const selectionEnd = editor.selectionEnd;
+            const text = editor.value;
+
+            const before = text.substring(0, selectionStart);
+            const selected = text.substring(selectionStart, selectionEnd);
+            const after = text.substring(selectionEnd);
+
+            const lines = selected.split('\n');
+            const listLines = lines.map(line => {
+                if (type === 'unordered') {
+                    return `- ${line}`;
+                } else {
+                    return `${lines.indexOf(line) + 1}. ${line}`;
+                }
+            });
+
+            editor.value = before + listLines.join('\n') + after;
+            editor.focus();
+        }
     </script>
 </body>
 </html>

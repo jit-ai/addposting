@@ -9,7 +9,8 @@
                 <h4>Quick Links</h4>
                 <ul>
                     <li><a href="/addposting/index.php">Home</a></li>
-                    <li><a href="/addposting/addposting.php">Add Posting</a></li>
+                    <li><a href="/addposting/statecitylist.php">Browse by Location</a></li>
+                    <li><a href="/addposting/add-posting.php">Add Posting</a></li>
                     <li><a href="/addposting/login.php">Login</a></li>
                     <li><a href="/addposting/register.php">Register</a></li>
                 </ul>

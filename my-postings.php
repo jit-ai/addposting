@@ -7,10 +7,15 @@ if (!isLoggedIn()) {
     redirect('login.php');
 }
 
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = 10;
+
 $postingModel = new Posting();
 
-// Get user's postings
-$userPostings = $postingModel->findByUserId($_SESSION['user_id']);
+// Get user's postings with pagination
+$offset = ($page - 1) * $perPage;
+$userPostings = $postingModel->findByUserId($_SESSION['user_id'], $perPage, $offset);
+$totalUserPostings = $postingModel->countByUserId($_SESSION['user_id']);
 ?>
 
 <!DOCTYPE html>

@@ -12,7 +12,8 @@
         <nav>
             <ul>
                 <li><a href="/addposting/index.php" class="active">Home</a></li>
-                <li><a href="/addposting/addposting.php" class="btn btn-primary">Add Posting</a></li>
+                <li><a href="/addposting/statecitylist.php">Browse by Location</a></li>
+                <li><a href="/addposting/add-posting.php" class="btn btn-primary">Add Posting</a></li>
                 <?php if (isLoggedIn()): ?>
                     <li class="dropdown">
                         <a href="#"><i class="fas fa-user"></i> My Account</a>
@@ -54,7 +55,8 @@
     <?php endif; ?>
     <ul>
         <li><a href="/addposting/index.php" class="active"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="/addposting/addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+        <li><a href="/addposting/statecitylist.php"><i class="fas fa-map-marked-alt"></i> Browse by Location</a></li>
+        <li><a href="/addposting/add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
         <?php if (isLoggedIn()): ?>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>

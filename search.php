@@ -21,6 +21,8 @@ if ($result && $result->num_rows > 0) {
 $category = isset($_GET['category']) ? sanitize($_GET['category']) : null;
 $state = isset($_GET['state']) ? sanitize($_GET['state']) : null;
 $city = isset($_GET['city']) ? sanitize($_GET['city']) : null;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = 10;
 
 // Get active categories for dropdown (for case-sensitive matching)
 $dbCategories = [];
@@ -88,12 +90,12 @@ if ($state) {
 
 // Get postings based on filters
 $filteredPostings = [];
+$totalPostings = 0;
 $postingModel = new Posting();
 
-if ($category || $state || $city) {
-    // Get filtered postings
-    $filteredPostings = $postingModel->getAll($category, null, $state, $city);
-}
+$offset = ($page - 1) * $perPage;
+$filteredPostings = $postingModel->getAll($category, null, $state, $city, $perPage, $offset);
+$totalPostings = $postingModel->getTotalCount($category, null, $state, $city);
 
 // Build page title
 $pageTitle = 'Search Results';
@@ -472,6 +474,9 @@ if ($category && $city) {
                                     <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn" target="_blank">
                                         <i class="fas fa-phone"></i> Call Now
                                     </a>
+                                    <a href="https://t.me/+<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="telegram-btn" target="_blank">
+                                        <i class="fab fa-telegram"></i> Telegram
+                                    </a>
                                 </div>
                             </div>
                     </div>
@@ -489,6 +494,16 @@ if ($category && $city) {
                             <a href="register.php" class="btn btn-primary">Register to Post</a>
                         <?php endif; ?>
                     </div>
+                <?php endif; ?>
+
+                <?php if (!empty($filteredPostings) && $totalPostings > $perPage): ?>
+                    <?php
+                    $queryParams = [];
+                    if ($category) $queryParams['category'] = $category;
+                    if ($state) $queryParams['state'] = $state;
+                    if ($city) $queryParams['city'] = $city;
+                    echo generatePagination($totalPostings, $perPage, $page, 'search.php', $queryParams);
+                    ?>
                 <?php endif; ?>
             </div>
         </div>

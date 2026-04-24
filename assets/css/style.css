@@ -53,6 +53,7 @@ nav ul {
     list-style: none;
     gap: 20px;
     align-items: center;
+    margin-bottom: 0px;
 }
 
 nav a {
@@ -665,6 +666,17 @@ nav a.active {
     background: #2d3748;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(26, 32, 44, 0.3);
+}
+
+.telegram-btn {
+    background: #0088cc;
+    color: white;
+}
+
+.telegram-btn:hover {
+    background: #006699;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
 }
 
 .save-btn {
@@ -2460,6 +2472,9 @@ header .logo {
     .call-btn {
         background: #667eea;
     }
+    .telegram-btn {
+        background: #0088cc;
+    }
     .no-postings {
         padding: 2rem 1rem;
         background: #1e293b;
@@ -2671,6 +2686,93 @@ header .logo {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
     }
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.pagination-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #1e293b;
+    color: #cbd5e1;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.pagination-link:hover {
+    background: #334155;
+    color: #f1f5f9;
+    border-color: #475569;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.pagination-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination-current {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    font-weight: 600;
+}
+
+.pagination-ellipsis {
+    color: #64748b;
+    padding: 0 0.5rem;
+    font-size: 1.2rem;
+}
+
+.pagination-prev,
+.pagination-next {
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .pagination {
+        gap: 0.25rem;
+    }
+    .pagination-link {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    .pagination-link i {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination {
+        justify-content: space-between;
+        gap: 0.25rem;
+    }
+    .pagination-link {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    .pagination-link:not(.pagination-prev):not(.pagination-next) {
+        display: none;
+    }
+    .pagination-current {
+        display: inline-flex;
+    }
+}
     .stat-card {
         padding: 1rem;
         flex-direction: column;

@@ -216,7 +216,16 @@ $recentPostings = $postingModel->getRecent(6);
         .call-btn:hover {
             background: #334155;
         }
-        
+
+        .telegram-btn {
+            background: #0088cc;
+            color: white;
+        }
+
+        .telegram-btn:hover {
+            background: #006699;
+        }
+
         .save-btn {
             background: #f1f5f9;
             color: #64748b;
@@ -324,6 +333,9 @@ $recentPostings = $postingModel->getRecent(6);
                                 </button>
                                 <button class="call-btn">
                                     <i class="fas fa-phone"></i> Call Now
+                                </button>
+                                <button class="telegram-btn">
+                                    <i class="fab fa-telegram"></i> Telegram
                                 </button>
                             </div>
                             <button class="save-btn">

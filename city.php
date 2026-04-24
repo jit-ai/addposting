@@ -10,6 +10,8 @@ $db = new Database();
 // Get city from URL parameter
 $city = isset($_GET['city']) ? sanitize($_GET['city']) : null;
 $state = isset($_GET['state']) ? sanitize($_GET['state']) : null;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = 10;
 
 // If city not provided, redirect to home
 if (!$city) {
@@ -49,8 +51,12 @@ $category = isset($_GET['category']) ? sanitize($_GET['category']) : null;
 
 // Get filtered postings
 $filteredPostings = [];
+$totalPostings = 0;
 $postingModel = new Posting();
-$filteredPostings = $postingModel->getAll($category, null, $cityState, $city);
+
+$offset = ($page - 1) * $perPage;
+$filteredPostings = $postingModel->getAll($category, null, $cityState, $city, $perPage, $offset);
+$totalPostings = $postingModel->getTotalCount($category, null, $cityState, $city);
 
 // Get posting count for this city
 $countSql = "SELECT COUNT(*) as count FROM postings WHERE city = ? AND status = 'active'";
@@ -270,12 +276,23 @@ $db->close();
                                 <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn">
                                     <i class="fas fa-phone"></i> Call
                                 </a>
+                                <a href="https://t.me/+<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="telegram-btn" target="_blank">
+                                    <i class="fab fa-telegram"></i> Telegram
+                                </a>
                             </div>
                         </div>
                     </div>
                     <?php endforeach; ?>
-                </div>
-            <?php else: ?>
+                    </div>
+
+                    <?php if ($totalPostings > $perPage): ?>
+                        <?php
+                        $queryParams = ['city' => $city];
+                        if ($cityState) $queryParams['state'] = $cityState;
+                        echo generatePagination($totalPostings, $perPage, $page, 'city.php', $queryParams);
+                        ?>
+                    <?php endif; ?>
+                <?php else: ?>
                 <div class="no-postings" style="text-align: center; padding: 4rem 2rem;">
                     <h3>No Listings Found in <?php echo $city; ?></h3>
                     <p>Be the first to list services in <?php echo $city; ?>.</p>
