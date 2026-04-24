@@ -294,7 +294,7 @@ foreach ($postings as &$posting) {
         <div class="main-content">
             <div class="page-header">
                 <h1>Postings</h1>
-                <a href="../add-posting.php" class="btn btn-primary">
+                <a href="../addposting.php" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Add New Posting
                 </a>
             </div>

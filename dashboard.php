@@ -68,7 +68,7 @@ foreach ($userPostings as $posting) {
             <nav>
                 <ul>
                     <li><a href="index.php" class="active">Home</a></li>
-                    <li><a href="add-posting.php" class="btn btn-primary">Add Posting</a></li>
+                    <li><a href="addposting.php" class="btn btn-primary">Add Posting</a></li>
                     <?php if (isLoggedIn()): ?>
                         <li class="dropdown">
                             <a href="#"><i class="fas fa-user"></i> My Account</a>
@@ -110,7 +110,7 @@ foreach ($userPostings as $posting) {
         <?php endif; ?>
         <ul>
             <li><a href="index.php" class="active"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
             <?php if (isLoggedIn()): ?>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>
@@ -186,7 +186,7 @@ foreach ($userPostings as $posting) {
             <div class="quick-actions">
                 <h3>Quick Actions</h3>
                 <div class="actions-grid">
-                    <a href="add-posting.php" class="action-card">
+                    <a href="addposting.php" class="action-card">
                         <i class="fas fa-plus-circle"></i>
                         <h4>Add New Posting</h4>
                         <p>Create a new item listing</p>
@@ -244,7 +244,7 @@ foreach ($userPostings as $posting) {
                             <i class="fas fa-inbox"></i>
                             <h4>No Postings Yet</h4>
                             <p>Create your first posting to start selling</p>
-                            <a href="add-posting.php" class="btn btn-primary">Create Posting</a>
+                            <a href="addposting.php" class="btn btn-primary">Create Posting</a>
                         </div>
                     <?php endif; ?>
                 </div>

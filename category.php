@@ -74,15 +74,15 @@ $db->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/add-posting/">
+    <base href="/addposting/">
     <title><?php echo $pageTitle; ?></title>
     <meta name="description" content="<?php echo $pageDescription; ?>">
     <meta name="keywords" content="<?php echo $category; ?>, services, listings, <?php echo $city ? $city : ''; ?>, <?php echo $state ? $state : ''; ?>, India, classifieds">
     <meta property="og:title" content="<?php echo $pageTitle; ?>">
     <meta property="og:description" content="<?php echo $pageDescription; ?>">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/category/' . urlencode($category); ?>">
-    <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/category/' . urlencode($category); ?>">
+    <meta property="og:url" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/category/' . urlencode($category); ?>">
+    <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/category/' . urlencode($category); ?>">
     
     <script type="application/ld+json">
     {
@@ -90,7 +90,7 @@ $db->close();
         "@type": "CollectionPage",
         "name": "<?php echo addslashes($pageTitle); ?>",
         "description": "<?php echo addslashes($pageDescription); ?>",
-        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/category/' . urlencode($category); ?>",
+        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/category/' . urlencode($category); ?>",
         "mainEntity": {
             "@type": "ItemList",
             "numberOfItems": <?php echo count($filteredPostings); ?>,
@@ -102,7 +102,7 @@ $db->close();
                     "item": {
                         "@type": "Service",
                         "name": "<?php echo addslashes($posting['title']); ?>",
-                        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>"
+                        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>"
                     }
                 }<?php echo $index < min(4, count($filteredPostings) - 1) ? ',' : ''; ?>
                 <?php endforeach; ?>
@@ -115,13 +115,13 @@ $db->close();
                     "@type": "ListItem",
                     "position": 1,
                     "name": "Home",
-                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/'; ?>"
+                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/'; ?>"
                 },
                 {
                     "@type": "ListItem",
                     "position": 2,
                     "name": "<?php echo ucfirst($category); ?>",
-                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/category/' . urlencode($category); ?>"
+                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/category/' . urlencode($category); ?>"
                 }
             ]
         }
@@ -320,7 +320,7 @@ $db->close();
                     <i class="fas fa-tags" style="font-size: 4rem; color: #64748b; margin-bottom: 1rem;"></i>
                     <h3>No <?php echo strtolower($category); ?> Listings Yet</h3>
                     <p>Be the first to post a <?php echo strtolower($category); ?> service in this category.</p>
-                    <a href="add-posting.php?category=<?php echo urlencode($category); ?>" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                    <a href="addposting.php?category=<?php echo urlencode($category); ?>" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
                         <i class="fas fa-plus"></i> Add <?php echo ucfirst($category); ?> Listing
                     </a>
                 </div>

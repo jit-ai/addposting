@@ -209,7 +209,7 @@ $userPostings = $postingModel->findByUserId($_SESSION['user_id']);
             <nav>
                 <ul>
                     <li><a href="index.php" class="active">Home</a></li>
-                    <li><a href="add-posting.php" class="btn btn-primary">Add Posting</a></li>
+                    <li><a href="addposting.php" class="btn btn-primary">Add Posting</a></li>
                     <?php if (isLoggedIn()): ?>
                         <li class="dropdown">
                             <a href="#"><i class="fas fa-user"></i> My Account</a>
@@ -251,7 +251,7 @@ $userPostings = $postingModel->findByUserId($_SESSION['user_id']);
         <?php endif; ?>
         <ul>
             <li><a href="index.php" class="active"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
             <?php if (isLoggedIn()): ?>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>
@@ -277,7 +277,7 @@ $userPostings = $postingModel->findByUserId($_SESSION['user_id']);
         <div class="container">
             <div class="page-header">
                 <h1>My Postings</h1>
-                <a href="add-posting.php" class="btn btn-primary">
+                <a href="addposting.php" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Add New Posting
                 </a>
             </div>
@@ -340,7 +340,7 @@ $userPostings = $postingModel->findByUserId($_SESSION['user_id']);
                     <i class="fas fa-inbox"></i>
                     <h3>No Postings Yet</h3>
                     <p>You haven't created any postings yet. Start by creating your first posting!</p>
-                    <a href="add-posting.php" class="btn btn-primary">Create Posting</a>
+                    <a href="addposting.php" class="btn btn-primary">Create Posting</a>
                 </div>
             <?php endif; ?>
         </div>

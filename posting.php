@@ -65,7 +65,7 @@ $author = $userModel->findById($posting['user_id']);
     <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>">
     <link rel="alternate" hreflang="en" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>">
     <?php if (!empty($posting['images'])): ?>
-    <meta property="og:image" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/uploads/postings/' . explode(',', $posting['images'])[0]; ?>">
+    <meta property="og:image" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/uploads/postings/' . explode(',', $posting['images'])[0]; ?>">
     <?php endif; ?>
     <script type="application/ld+json">
 {
@@ -75,7 +75,7 @@ $author = $userModel->findById($posting['user_id']);
     "description": "<?php echo addslashes(substr(strip_tags($posting['description']), 0, 500)); ?>",
     "category": "<?php echo addslashes($posting['category']); ?>",
     <?php if (!empty($posting['images'])): ?>
-    "image": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/uploads/postings/' . explode(',', $posting['images'])[0]; ?>",
+    "image": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/uploads/postings/' . explode(',', $posting['images'])[0]; ?>",
     <?php endif; ?>
     <?php if (!empty($posting['price']) && $posting['price'] > 0): ?>
     "offers": {
@@ -97,7 +97,7 @@ $author = $userModel->findById($posting['user_id']);
     }
 }
 </script>
-    <link rel="stylesheet" href="/add-posting/assets/css/style.css">
+    <link rel="stylesheet" href="/addposting/assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .posting-detail {

@@ -8,18 +8,18 @@
             <div class="footer-column">
                 <h4>Quick Links</h4>
                 <ul>
-                    <li><a href="/add-posting/index.php">Home</a></li>
-                    <li><a href="/add-posting/add-posting.php">Add Posting</a></li>
-                    <li><a href="/add-posting/login.php">Login</a></li>
-                    <li><a href="/add-posting/register.php">Register</a></li>
+                    <li><a href="/addposting/index.php">Home</a></li>
+                    <li><a href="/addposting/addposting.php">Add Posting</a></li>
+                    <li><a href="/addposting/login.php">Login</a></li>
+                    <li><a href="/addposting/register.php">Register</a></li>
                 </ul>
             </div>
             <div class="footer-column">
                 <h4>Support</h4>
                 <ul>
-                    <li><a href="/add-posting/terms.php">Terms of Service</a></li>
-                    <li><a href="/add-posting/privacy.php">Privacy Policy</a></li>
-                    <li><a href="/add-posting/contact.php">Contact Us</a></li>
+                    <li><a href="/addposting/terms.php">Terms of Service</a></li>
+                    <li><a href="/addposting/privacy.php">Privacy Policy</a></li>
+                    <li><a href="/addposting/contact.php">Contact Us</a></li>
                 </ul>
             </div>
             <div class="footer-column">

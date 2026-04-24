@@ -115,7 +115,7 @@ if ($category && $city) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/add-posting/">
+    <base href="/addposting/">
     <meta name="description" content="Search <?php echo $category ? ucfirst($category) : ''; ?> listings in <?php echo $city ? $city : ($state ? $state : 'India'); ?>. Find the best <?php echo $category ? strtolower($category) : 'services'; ?> near you.">
     <meta name="keywords" content="<?php echo $category ? $category : 'postings'; ?>, <?php echo $city ? $city : ''; ?>, <?php echo $state ? $state : ''; ?>, classified ads, listings">
     <meta property="og:title" content="<?php echo $pageTitle; ?> - <?php echo APP_NAME; ?>">
@@ -140,7 +140,7 @@ if ($category && $city) {
                 {
                     "@type": "ListItem",
                     "position": <?php echo $index + 1; ?>,
-                    "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>"
+                    "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>"
                 }<?php echo $index < min(4, count($filteredPostings) - 1) ? ',' : ''; ?>
                 <?php endforeach; ?>
             ]
@@ -220,7 +220,7 @@ if ($category && $city) {
             <nav>
                 <ul>
                     <li><a href="index.php">Home</a></li>
-                    <li><a href="add-posting.php" class="btn btn-primary">Add Posting</a></li>
+                    <li><a href="addposting.php" class="btn btn-primary">Add Posting</a></li>
                     <?php if (isLoggedIn()): ?>
                         <li class="dropdown">
                             <a href="#"><i class="fas fa-user"></i> My Account</a>
@@ -262,7 +262,7 @@ if ($category && $city) {
         <?php endif; ?>
         <ul>
             <li><a href="index.php"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
             <?php if (isLoggedIn()): ?>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>
@@ -484,7 +484,7 @@ if ($category && $city) {
                             No postings match your selected filters. Try different category or state.
                         </p>
                         <?php if (isLoggedIn()): ?>
-                            <a href="add-posting.php" class="btn btn-primary">Add Posting</a>
+                            <a href="addposting.php" class="btn btn-primary">Add Posting</a>
                         <?php else: ?>
                             <a href="register.php" class="btn btn-primary">Register to Post</a>
                         <?php endif; ?>

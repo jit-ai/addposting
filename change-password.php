@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <nav>
                 <ul>
                     <li><a href="index.php">Home</a></li>
-                    <li><a href="add-posting.php">Add Posting</a></li>
+                    <li><a href="addposting.php">Add Posting</a></li>
                     <?php if (isLoggedIn()): ?>
                         <li class="dropdown">
                             <a href="#"><i class="fas fa-user"></i> My Account</a>
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         <ul>
             <li><a href="index.php"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
             <?php if (isLoggedIn()): ?>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>

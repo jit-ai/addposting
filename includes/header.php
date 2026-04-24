@@ -1,7 +1,7 @@
 <header>
     <div class="container">
         <div class="logo">
-            <a href="/add-posting/index.php" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+            <a href="/addposting/index.php" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
                 <i class="fas fa-store"></i>
                 <h1><?php echo APP_NAME; ?></h1>
             </a>
@@ -11,24 +11,24 @@
         </button>
         <nav>
             <ul>
-                <li><a href="/add-posting/index.php" class="active">Home</a></li>
-                <li><a href="/add-posting/add-posting.php" class="btn btn-primary">Add Posting</a></li>
+                <li><a href="/addposting/index.php" class="active">Home</a></li>
+                <li><a href="/addposting/addposting.php" class="btn btn-primary">Add Posting</a></li>
                 <?php if (isLoggedIn()): ?>
                     <li class="dropdown">
                         <a href="#"><i class="fas fa-user"></i> My Account</a>
                         <div class="dropdown-content">
-                            <a href="/add-posting/dashboard.php">Dashboard</a>
-                            <a href="/add-posting/my-postings.php">My Postings</a>
-                            <a href="/add-posting/profile.php">Profile</a>
-                            <a href="/add-posting/logout.php">Logout</a>
+                            <a href="/addposting/dashboard.php">Dashboard</a>
+                            <a href="/addposting/my-postings.php">My Postings</a>
+                            <a href="/addposting/profile.php">Profile</a>
+                            <a href="/addposting/logout.php">Logout</a>
                         </div>
                     </li>
                 <?php else: ?>
-                    <li><a href="/add-posting/login.php">Login</a></li>
-                    <li><a href="/add-posting/register.php">Register</a></li>
+                    <li><a href="/addposting/login.php">Login</a></li>
+                    <li><a href="/addposting/register.php">Register</a></li>
                 <?php endif; ?>
                 <?php if (isAdmin()): ?>
-                    <li><a href="/add-posting/admin/dashboard.php" class="btn btn-danger">Admin Dashboard</a></li>
+                    <li><a href="/addposting/admin/dashboard.php" class="btn btn-danger">Admin Dashboard</a></li>
                 <?php endif; ?>
             </ul>
         </nav>
@@ -53,24 +53,24 @@
     </div>
     <?php endif; ?>
     <ul>
-        <li><a href="/add-posting/index.php" class="active"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="/add-posting/add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+        <li><a href="/addposting/index.php" class="active"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="/addposting/addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
         <?php if (isLoggedIn()): ?>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>
                 <div class="dropdown-content">
-                    <a href="/add-posting/dashboard.php">Dashboard</a>
-                    <a href="/add-posting/my-postings.php">My Postings</a>
-                    <a href="/add-posting/profile.php">Profile</a>
-                    <a href="/add-posting/logout.php">Logout</a>
+                    <a href="/addposting/dashboard.php">Dashboard</a>
+                    <a href="/addposting/my-postings.php">My Postings</a>
+                    <a href="/addposting/profile.php">Profile</a>
+                    <a href="/addposting/logout.php">Logout</a>
                 </div>
             </li>
         <?php else: ?>
-            <li><a href="/add-posting/login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-            <li><a href="/add-posting/register.php"><i class="fas fa-user-plus"></i> Register</a></li>
+            <li><a href="/addposting/login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            <li><a href="/addposting/register.php"><i class="fas fa-user-plus"></i> Register</a></li>
         <?php endif; ?>
         <?php if (isAdmin()): ?>
-            <li><a href="/add-posting/admin/dashboard.php"><i class="fas fa-cog"></i> Admin Dashboard</a></li>
+            <li><a href="/addposting/admin/dashboard.php"><i class="fas fa-cog"></i> Admin Dashboard</a></li>
         <?php endif; ?>
     </ul>
 </div>

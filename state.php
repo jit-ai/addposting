@@ -71,15 +71,15 @@ $db->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/add-posting/">
+    <base href="/addposting/">
     <title><?php echo $pageTitle; ?></title>
     <meta name="description" content="<?php echo $pageDescription; ?>">
     <meta name="keywords" content="<?php echo $state; ?>, services <?php echo $state; ?>, listings <?php echo $state; ?>, <?php echo implode(', ', $citiesInState); ?>">
     <meta property="og:title" content="<?php echo $pageTitle; ?>">
     <meta property="og:description" content="<?php echo $pageDescription; ?>">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/state/' . urlencode($state); ?>">
-    <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/state/' . urlencode($state); ?>">
+    <meta property="og:url" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/state/' . urlencode($state); ?>">
+    <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/state/' . urlencode($state); ?>">
     
     <script type="application/ld+json">
     {
@@ -87,12 +87,12 @@ $db->close();
         "@type": "CollectionPage",
         "name": "<?php echo addslashes($pageTitle); ?>",
         "description": "<?php echo addslashes($pageDescription); ?>",
-        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/state/' . urlencode($state); ?>",
+        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/state/' . urlencode($state); ?>",
         "breadcrumb": {
             "@type": "BreadcrumbList",
             "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Home", "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/'; ?>"},
-                {"@type": "ListItem", "position": 2, "name": "<?php echo $state; ?>", "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/state/' . urlencode($state); ?>"}
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/'; ?>"},
+                {"@type": "ListItem", "position": 2, "name": "<?php echo $state; ?>", "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/state/' . urlencode($state); ?>"}
             ]
         }
     }
@@ -225,7 +225,7 @@ $db->close();
                     <i class="fas fa-map" style="font-size: 4rem; color: #64748b;"></i>
                     <h3>No Services in <?php echo $state; ?> Yet</h3>
                     <p>Be the first service provider in <?php echo $state; ?>.</p>
-                    <a href="add-posting.php?state=<?php echo urlencode($state); ?>" class="btn btn-primary">
+                    <a href="addposting.php?state=<?php echo urlencode($state); ?>" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Add Service in <?php echo $state; ?>
                     </a>
                 </div>

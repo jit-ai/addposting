@@ -44,7 +44,7 @@ A complete PHP-based add posting website with user authentication, admin dashboa
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd add-posting
+   cd addposting
    ```
 
 2. **Create database**
@@ -96,7 +96,7 @@ A complete PHP-based add posting website with user authentication, admin dashboa
 8. **Access the website**
    Open your browser and navigate to:
    ```
-   http://localhost/add-posting
+   http://localhost/addposting
    ```
 
 ## Default Credentials
@@ -108,7 +108,7 @@ A complete PHP-based add posting website with user authentication, admin dashboa
 ## Project Structure
 
 ```
-add-posting/
+addposting/
 ├── config/                    # Configuration files
 │   └── database.php          # Database configuration
 ├── includes/                 # Core functionality
@@ -135,7 +135,7 @@ add-posting/
 ├── forgot-password.php       # Forgot password
 ├── reset-password.php        # Reset password
 ├── dashboard.php             # User dashboard
-├── add-posting.php           # Add posting
+├── addposting.php           # Add posting
 ├── my-postings.php           # User's postings
 ├── edit-posting.php          # Edit posting
 ├── delete-posting.php        # Delete posting

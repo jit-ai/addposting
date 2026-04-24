@@ -591,7 +591,7 @@ if (isset($_GET['id'])) {
             <?php endif; ?>
             
             <?php if (empty($success)): ?>
-                <form method="POST" action="add-posting.php<?php echo $isEditing ? '?id=' . $postId : ''; ?>" enctype="multipart/form-data">
+                <form method="POST" action="addposting.php<?php echo $isEditing ? '?id=' . $postId : ''; ?>" enctype="multipart/form-data">
                     <div class="form-section">
                         <label for="title">Post Title</label>
                         <input type="text" id="title" name="title" class="title-input" required placeholder="Enter a catchy title..." value="<?php echo htmlspecialchars($title); ?>">

@@ -75,15 +75,15 @@ $db->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/add-posting/">
+    <base href="/addposting/">
     <title><?php echo $pageTitle; ?></title>
     <meta name="description" content="<?php echo $pageDescription; ?>">
     <meta name="keywords" content="<?php echo $city; ?>, <?php echo $category ?? ''; ?> services, listings, <?php echo $cityState ?? ''; ?>, India">
     <meta property="og:title" content="<?php echo $pageTitle; ?>">
     <meta property="og:description" content="<?php echo $pageDescription; ?>">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/city/' . urlencode($city); ?>">
-    <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/city/' . urlencode($city); ?>">
+    <meta property="og:url" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/city/' . urlencode($city); ?>">
+    <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/city/' . urlencode($city); ?>">
     
     <script type="application/ld+json">
     {
@@ -91,7 +91,7 @@ $db->close();
         "@type": "CollectionPage",
         "name": "<?php echo addslashes($pageTitle); ?>",
         "description": "<?php echo addslashes($pageDescription); ?>",
-        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/city/' . urlencode($city); ?>",
+        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/city/' . urlencode($city); ?>",
         "mainEntity": {
             "@type": "ItemList",
             "numberOfItems": <?php echo count($filteredPostings); ?>
@@ -103,13 +103,13 @@ $db->close();
                     "@type": "ListItem",
                     "position": 1,
                     "name": "Home",
-                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/'; ?>"
+                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/'; ?>"
                 },
                 {
                     "@type": "ListItem",
                     "position": 2,
                     "name": "<?php echo $city; ?>",
-                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/city/' . urlencode($city); ?>"
+                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/city/' . urlencode($city); ?>"
                 }
             ]
         }
@@ -279,7 +279,7 @@ $db->close();
                 <div class="no-postings" style="text-align: center; padding: 4rem 2rem;">
                     <h3>No Listings Found in <?php echo $city; ?></h3>
                     <p>Be the first to list services in <?php echo $city; ?>.</p>
-                    <a href="add-posting.php?city=<?php echo urlencode($city); ?>" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                    <a href="addposting.php?city=<?php echo urlencode($city); ?>" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
                         <i class="fas fa-plus"></i> Add Listing in <?php echo $city; ?>
                     </a>
                 </div>

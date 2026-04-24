@@ -58,7 +58,7 @@ if (!empty($filteredPostings) && !$category && !$state && !$city) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/add-posting/">
+    <base href="/addposting/">
     <meta name="description" content="<?php echo APP_NAME; ?> - Buy and sell everything in India. Find listings for <?php echo !empty($categories) ? implode(', ', array_slice($categories, 0, 5)) : 'various categories'; ?>. Post your ads for free.">
     <meta name="google-site-verification" content="yb5NctbbrRbjl4vT9_E2ffWAyPnNdHO-esGbdmlfGcI" />
     <meta name="keywords" content="classified ads, buy and sell, <?php echo !empty($categories) ? implode(', ', $categories) : 'postings'; ?>, India">
@@ -70,7 +70,7 @@ if (!empty($filteredPostings) && !$category && !$state && !$city) {
     <meta name="twitter:title" content="<?php echo APP_NAME; ?> - Buy and Sell Everything">
     <meta name="twitter:description" content="Buy and sell everything in India. Find the best deals near you.">
     <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>">
-    <meta property="og:image" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/assets/images/logo.png'; ?>">
+    <meta property="og:image" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/assets/images/logo.png'; ?>">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -80,7 +80,7 @@ if (!empty($filteredPostings) && !$category && !$state && !$city) {
         "description": "Buy and sell everything in India. Find the best deals near you.",
         "potentialAction": {
             "@type": "SearchAction",
-            "target": "<?php echo 'https://' . $_SERVER['HTTP_HOST']; ?>/add-posting/search.php?category={search_term_string}",
+            "target": "<?php echo 'https://' . $_SERVER['HTTP_HOST']; ?>/addposting/search.php?category={search_term_string}",
             "query-input": "required name=search_term_string"
         }
     }
@@ -256,7 +256,7 @@ if (!empty($filteredPostings) && !$category && !$state && !$city) {
         <?php endif; ?>
         <ul>
             <li><a href="index.php" class="active"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
             <?php if (isLoggedIn()): ?>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>

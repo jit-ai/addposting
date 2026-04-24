@@ -1,5 +1,5 @@
 RewriteEngine On
-RewriteBase /add-posting/
+RewriteBase /addposting/
 
 # Allow assets folder
 RewriteCond %{REQUEST_URI} ^/assets/ [NC]

@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://yourdomain.com/add-posting/sitemap.xml
+Sitemap: https://yourdomain.com/addposting/sitemap.xml
 
 # Allow Googlebot
 User-agent: Googlebot
