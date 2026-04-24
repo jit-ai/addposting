@@ -1,0 +1,28 @@
+[03-Apr-2026 18:43:03 UTC] PHP Notice:  Only variables should be passed by reference in /home/a9tvcy28mmbu/public_html/includes/User.php on line 20
+[04-Apr-2026 05:42:49 UTC] PHP Notice:  Only variables should be passed by reference in /home/a9tvcy28mmbu/public_html/includes/User.php on line 20
+[04-Apr-2026 06:41:41 UTC] PHP Notice:  Only variables should be passed by reference in /home/a9tvcy28mmbu/public_html/includes/User.php on line 20
+[04-Apr-2026 06:58:54 UTC] PHP Notice:  Only variables should be passed by reference in /home/a9tvcy28mmbu/public_html/includes/User.php on line 20
+[04-Apr-2026 07:23:58 UTC] PHP Warning:  Undefined array key "location" in /home/a9tvcy28mmbu/public_html/edit-posting.php on line 474
+[04-Apr-2026 12:54:15 UTC] PHP Notice:  Only variables should be passed by reference in /home/a9tvcy28mmbu/public_html/includes/User.php on line 20
+[07-Apr-2026 08:25:14 UTC] PHP Warning:  Undefined array key "location" in /home/a9tvcy28mmbu/public_html/edit-posting.php on line 474
+[08-Apr-2026 06:19:55 UTC] PHP Notice:  Only variables should be passed by reference in /home/a9tvcy28mmbu/public_html/includes/User.php on line 20
+[09-Apr-2026 22:22:44 UTC] PHP Notice:  Only variables should be passed by reference in /home/a9tvcy28mmbu/public_html/includes/User.php on line 20
+[10-Apr-2026 09:15:02 UTC] PHP Warning:  Undefined array key "location" in /home/a9tvcy28mmbu/public_html/edit-posting.php on line 474
+[10-Apr-2026 09:15:51 UTC] PHP Fatal error:  Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in /home/a9tvcy28mmbu/public_html/includes/Posting.php:154
+Stack trace:
+#0 /home/a9tvcy28mmbu/public_html/includes/Posting.php(154): mysqli_stmt->bind_param()
+#1 /home/a9tvcy28mmbu/public_html/edit-posting.php(115): Posting->update()
+#2 {main}
+  thrown in /home/a9tvcy28mmbu/public_html/includes/Posting.php on line 154
+[10-Apr-2026 09:15:55 UTC] PHP Warning:  Undefined array key "location" in /home/a9tvcy28mmbu/public_html/edit-posting.php on line 474
+[11-Apr-2026 12:30:20 UTC] PHP Notice:  Only variables should be passed by reference in /home/a9tvcy28mmbu/public_html/includes/User.php on line 20
+[11-Apr-2026 12:34:29 UTC] PHP Warning:  Undefined array key "location" in /home/a9tvcy28mmbu/public_html/edit-posting.php on line 474
+[12-Apr-2026 11:36:31 UTC] PHP Warning:  Undefined array key "location" in /home/a9tvcy28mmbu/public_html/edit-posting.php on line 474
+[12-Apr-2026 11:37:16 UTC] PHP Fatal error:  Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in /home/a9tvcy28mmbu/public_html/includes/Posting.php:154
+Stack trace:
+#0 /home/a9tvcy28mmbu/public_html/includes/Posting.php(154): mysqli_stmt->bind_param()
+#1 /home/a9tvcy28mmbu/public_html/edit-posting.php(115): Posting->update()
+#2 {main}
+  thrown in /home/a9tvcy28mmbu/public_html/includes/Posting.php on line 154
+[12-Apr-2026 11:37:20 UTC] PHP Warning:  Undefined array key "location" in /home/a9tvcy28mmbu/public_html/edit-posting.php on line 474
+[14-Apr-2026 06:01:57 UTC] PHP Notice:  Only variables should be passed by reference in /home/a9tvcy28mmbu/public_html/includes/User.php on line 20

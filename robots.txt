@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yourdomain.com/add-posting/sitemap.xml
+
+# Allow Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /config/
+Disallow: /sql/
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: SEMrushBot
+Crawl-delay: 10

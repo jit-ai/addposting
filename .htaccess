@@ -1,0 +1,26 @@
+RewriteEngine On
+RewriteBase /add-posting/
+
+# Allow assets folder
+RewriteCond %{REQUEST_URI} ^/assets/ [NC]
+RewriteRule ^ - [L]
+
+# Block sensitive files
+RewriteRule ^(config|sql|includes/database\.php|debug-) - [F,L]
+
+# Skip real files
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Skip directories
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# SEO URLs
+RewriteRule ^category/([^/]+)/?$ category.php?category=$1 [L,QSA]
+RewriteRule ^state/([^/]+)/?$ state.php?state=$1 [L,QSA]
+RewriteRule ^city/([^/]+)/?$ city.php?city=$1 [L,QSA]
+RewriteRule ^posting/([^/]+)/?$ posting.php?title=$1 [L,QSA]
+RewriteRule ^search/([^/]+)/([^/]+)/?$ search.php?category=$1&location=$2 [L,QSA]
+RewriteRule ^search/([^/]+)/?$ search.php?category=$1 [L,QSA]
+RewriteRule ^([^/]+)/([^/]+)/?$ search.php?category=$1&location=$2 [L,QSA]
