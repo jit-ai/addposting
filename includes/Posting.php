@@ -52,6 +52,19 @@ public function create($data) {
         
         // First, publish any scheduled posts that are due
         $this->publishScheduledPosts();
+        // Check if title ends with -ID (numeric)
+        if (preg_match('/^(.+)-(\d+)$/', $title, $matches)) {
+            $slug = $matches[1];
+            $id = $matches[2];
+            // Find by ID first for efficiency
+            $posting = $this->findById($id);
+            if ($posting && $posting['status'] === 'active') {
+                $urlTitle = strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title'])));
+                if ($urlTitle === $slug) {
+                    return $posting;
+                }
+            }
+        }
         
         // Get all active postings and find matching title
         $sql = "SELECT * FROM " . $this->table . " WHERE status = 'active' ORDER BY created_at DESC";

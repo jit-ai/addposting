@@ -659,10 +659,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
 
-                    <div class="form-section">
-                        <label for="contact">Contact Information</label>
-                        <input type="tel" id="contact" name="contact" required placeholder="Enter phone number" value="<?php echo htmlspecialchars($contact); ?>" pattern="[0-9]+" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width: 100%; padding: 0.75rem; border: 1px solid #444; border-radius: 8px; font-size: 1rem; background: #2a2a2a; color: #f0f0f0; transition: border-color 0.2s;">
-                    </div>
+                   <div class="form-section">
+    <label for="contact">Contact Information</label>
+    <div style="display:flex;">
+        <span style="padding: 0.75rem; background:#2a2a2a; border:1px solid #444; border-right:none; border-radius:8px 0 0 8px; color:#f0f0f0;">+91</span>
+        <input 
+            type="tel" 
+            id="contact" 
+            name="contact" 
+            required 
+            placeholder="Enter phone number"
+            value="<?php echo htmlspecialchars($contact); ?>" 
+            pattern="[0-9]{10}"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            style="width: 100%; padding: 0.75rem; border: 1px solid #444; border-radius: 0 8px 8px 0; font-size: 1rem; background: #2a2a2a; color: #f0f0f0;"
+        >
+    </div>
+</div>
 
                     <div class="form-section">
                         <label for="status">Status</label>

@@ -64,11 +64,12 @@ if (!empty($filteredPostings) && !$category && !$state && !$city) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="/addposting/">
+    <link rel="icon" type="image/png" href="https://admypost.org/assets/logonewadd.png">
     <meta name="description" content="<?php echo APP_NAME; ?> - Buy and sell everything in India. Find listings for <?php echo !empty($categories) ? implode(', ', array_slice($categories, 0, 5)) : 'various categories'; ?>. Post your ads for free.">
     <meta name="google-site-verification" content="yb5NctbbrRbjl4vT9_E2ffWAyPnNdHO-esGbdmlfGcI" />
     <meta name="keywords" content="classified ads, buy and sell, <?php echo !empty($categories) ? implode(', ', $categories) : 'postings'; ?>, India">
     <meta property="og:title" content="<?php echo APP_NAME; ?> - Buy and Sell Everything">
-    <meta property="og:description" content="Buy and sell everything in India. Find the best deals near you.">
+    <meta property="og:description" content="Add posting website">
     <meta property="og:type" content="website">
     <meta property="og:url" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>">
     <meta name="twitter:card" content="summary_large_image">
@@ -626,6 +627,8 @@ Delhi</option>
         </div>
     </section>
     <?php endif; ?>
+    
+    
 
     <!-- Popular States Section -->
     <!-- <section class="categories-section" style="background: #1a202c;">
@@ -742,115 +745,115 @@ Delhi</option>
     </section> -->
 
     <!-- Madhya Pradesh Cities Section -->
-    <section class="categories-section" style="background: #1a202c;">
-        <div class="container">
-            <h2>
-                <i class="fas fa-city"></i>
-                Madhya Pradesh Cities
-            </h2>
-            <div class="category-cards">
-                <a href="city/Bhopal" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-university"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Bhopal</div>
-                        <div class="category-card-desc">Capital of MP</div>
-                    </div>
-                </a>
-                <a href="city/Indore" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-building"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Indore</div>
-                        <div class="category-card-desc">Commercial Capital</div>
-                    </div>
-                </a>
-                <a href="city/Jabalpur" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-mountain"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Jabalpur</div>
-                        <div class="category-card-desc">Maharishi City</div>
-                    </div>
-                </a>
-                <a href="city/Gwalior" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-landmark"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Gwalior</div>
-                        <div class="category-card-desc">Fort City</div>
-                    </div>
-                </a>
-                <a href="city/Ujjain" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-mosque"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Ujjain</div>
-                        <div class="category-card-desc">Temple City</div>
-                    </div>
-                </a>
-                <a href="city/Sagar" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-mountain"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Sagar</div>
-                        <div class="category-card-desc">Educational Hub</div>
-                    </div>
-                </a>
-                <a href="city/Satna" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-university"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Satna</div>
-                        <div class="category-card-desc">Cement City</div>
-                    </div>
-                </a>
-                <a href="city/Rewa" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-landmark"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Rewa</div>
-                        <div class="category-card-desc">Baghelkhand</div>
-                    </div>
-                </a>
-                <a href="city/Datia" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-mosque"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Datia</div>
-                        <div class="category-card-desc">Peetambra City</div>
-                    </div>
-                </a>
-                <a href="city/Damoh" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-mountain"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Damoh</div>
-                        <div class="category-card-desc">Rice City</div>
-                    </div>
-                </a>
-                <a href="city/Guna" class="category-card">
-                    <div class="category-card-image">
-                        <i class="fas fa-university"></i>
-                    </div>
-                    <div class="category-card-content">
-                        <div class="category-card-name">Guna</div>
-                        <div class="category-card-desc">Education Hub</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
+    <!--<section class="categories-section" style="background: #1a202c;">-->
+    <!--    <div class="container">-->
+    <!--        <h2>-->
+    <!--            <i class="fas fa-city"></i>-->
+    <!--            Madhya Pradesh Cities-->
+    <!--        </h2>-->
+    <!--        <div class="category-cards">-->
+    <!--            <a href="city/Bhopal" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-university"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Bhopal</div>-->
+    <!--                    <div class="category-card-desc">Capital of MP</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Indore" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-building"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Indore</div>-->
+    <!--                    <div class="category-card-desc">Commercial Capital</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Jabalpur" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-mountain"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Jabalpur</div>-->
+    <!--                    <div class="category-card-desc">Maharishi City</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Gwalior" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-landmark"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Gwalior</div>-->
+    <!--                    <div class="category-card-desc">Fort City</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Ujjain" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-mosque"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Ujjain</div>-->
+    <!--                    <div class="category-card-desc">Temple City</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Sagar" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-mountain"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Sagar</div>-->
+    <!--                    <div class="category-card-desc">Educational Hub</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Satna" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-university"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Satna</div>-->
+    <!--                    <div class="category-card-desc">Cement City</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Rewa" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-landmark"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Rewa</div>-->
+    <!--                    <div class="category-card-desc">Baghelkhand</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Datia" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-mosque"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Datia</div>-->
+    <!--                    <div class="category-card-desc">Peetambra City</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Damoh" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-mountain"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Damoh</div>-->
+    <!--                    <div class="category-card-desc">Rice City</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--            <a href="city/Guna" class="category-card">-->
+    <!--                <div class="category-card-image">-->
+    <!--                    <i class="fas fa-university"></i>-->
+    <!--                </div>-->
+    <!--                <div class="category-card-content">-->
+    <!--                    <div class="category-card-name">Guna</div>-->
+    <!--                    <div class="category-card-desc">Education Hub</div>-->
+    <!--                </div>-->
+    <!--            </a>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</section>-->
 
     <?php include 'includes/footer.php'; ?>
 

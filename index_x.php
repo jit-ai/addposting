@@ -233,7 +233,7 @@ if (!empty($filteredPostings) && !$category && !$state && !$city) {
         <?php endif; ?>
         <ul>
             <li><a href="index.php" class="active"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
             <?php if (isLoggedIn()): ?>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>

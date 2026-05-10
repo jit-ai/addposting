@@ -48,7 +48,7 @@ $pageDescription = "Find listings by state and city across India. Browse verifie
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/addposting/">
+    <base href="/">
     <title><?php echo $pageTitle; ?></title>
     <meta name="description" content="<?php echo $pageDescription; ?>">
     <meta name="keywords" content="states, cities, locations, India, listings, browse by location">
@@ -246,5 +246,4 @@ $pageDescription = "Find listings by state and city across India. Browse verifie
     <?php include 'includes/footer.php'; ?>
     <script src="assets/js/main.js?v=<?php echo time(); ?>"></script>
 </body>
-</html></content>
-<parameter name="filePath">C:\xampp\htdocs\addposting\statecitylist.php
+</html>

@@ -92,7 +92,8 @@ elseif (isLoggedIn()) {
         $publish = isset($latestPost['publish']) ? $latestPost['publish'] : 'immediately';
         $schedule_date = isset($latestPost['schedule_date']) ? $latestPost['schedule_date'] : '';
         $schedule_time = isset($latestPost['schedule_time']) ? $latestPost['schedule_time'] : '';
-        $existingImages = $latestPost['images'];
+        // Don't copy images for new post
+        $existingImages = '';
     }
 }
 
@@ -211,11 +212,7 @@ elseif (isLoggedIn()) {
                 }
             } else {
                 // Creating new
-                if (empty($images) && !empty($existingImages)) {
-                    $data['images'] = $existingImages;
-                } else {
-                    $data['images'] = implode(',', $images);
-                }
+                $data['images'] = implode(',', $images);
                 if ($postingModel->create($data)) {
                     $success = 'Posting created successfully!';
                     $_POST = []; // Clear form

@@ -79,17 +79,18 @@ $db->close();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="/addposting/">
-    <title><?php echo $pageTitle; ?></title>
-    <meta name="description" content="<?php echo $pageDescription; ?>">
+    <link rel="icon" type="image/png" href="https://admypost.org/assets/logonewadd.png">
+    <title><?php echo $pageTitle; ?> Male Escorts & Call Boy, Play Boy Job And Gay Escort Adult Meeting</title>
+    <meta name="description" content="<?php echo $pageDescription; ?>Find on MALE ESCORTS and gay escorts category +1200 call boys ads Play Boy available. Amateur and professional ads on Admypost, find yours now and enjoy!">
     <meta name="keywords" content="<?php echo $city; ?>, <?php echo $category ?? ''; ?> services, listings, <?php echo $cityState ?? ''; ?>, India">
     <meta property="og:title" content="<?php echo $pageTitle; ?>">
-    <meta property="og:description" content="<?php echo $pageDescription; ?>">
+    <meta property="og:description" content="<?php echo $pageDescription; ?>Find on MALE ESCORTS and gay escorts category +1200 call boys ads Play Boy available. Amateur and professional ads on Admypost, find yours now and enjoy!">
     <meta property="og:type" content="website">
     <meta property="og:url" content="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/city/' . urlencode($city); ?>">
-    <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/city/' . urlencode($city); ?>">
+    <link rel="canonical" href="<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/city/' . urlencode($city); ?>">
     
     <script type="application/ld+json">
     {
@@ -97,7 +98,7 @@ $db->close();
         "@type": "CollectionPage",
         "name": "<?php echo addslashes($pageTitle); ?>",
         "description": "<?php echo addslashes($pageDescription); ?>",
-        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/city/' . urlencode($city); ?>",
+        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/city/' . urlencode($city); ?>",
         "mainEntity": {
             "@type": "ItemList",
             "numberOfItems": <?php echo count($filteredPostings); ?>
@@ -109,13 +110,13 @@ $db->close();
                     "@type": "ListItem",
                     "position": 1,
                     "name": "Home",
-                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/'; ?>"
+                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/'; ?>"
                 },
                 {
                     "@type": "ListItem",
                     "position": 2,
                     "name": "<?php echo $city; ?>",
-                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/city/' . urlencode($city); ?>"
+                    "item": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/city/' . urlencode($city); ?>"
                 }
             ]
         }
@@ -208,7 +209,7 @@ $db->close();
 
 
     <!-- Category Filter -->
-    <section class="index-hero" style="padding: 2rem 0;">
+    <section class="index-hero" style="padding: 2rem 0;margin-top: 50px;">
         <div class="container">
             <div class="search-container">
                 <form method="GET" action="city.php?city=<?php echo urlencode($city); ?>" id="searchForm">
@@ -234,6 +235,43 @@ $db->close();
             </div>
         </div>
     </section>
+    
+    
+<!-- Breadcrumb Navigation -->
+<?php $serviceName = $_GET['service'] ?? ''; ?>
+
+<section class="breadcrumb-section" style="background:#1b1b1b; padding: 1rem 0; border-bottom:1px solid #1b1b1b;">
+    <div class="container">
+        <div class="city-breadcrumb" style="color:#334155;">
+            
+            <!-- Home -->
+            <a href="index.php"><i class="fas fa-home"></i> Home</a>
+
+            <!-- Service -->
+            <?php if ($serviceName): ?>
+                <span><i class="fas fa-chevron-right"></i></span>
+                <a href="/city/<?php echo urlencode($serviceName); ?>">
+                    <?php echo htmlspecialchars($serviceName); ?>
+                </a>
+            <?php endif; ?>
+
+            <!-- State -->
+            <?php if ($cityState): ?>
+                <span><i class="fas fa-chevron-right"></i></span>
+                <a href="/city/<?php echo urlencode($serviceName); ?>/<?php echo urlencode($cityState); ?>">
+                    <?php echo htmlspecialchars($cityState); ?>
+                </a>
+            <?php endif; ?>
+
+            <!-- City -->
+            <span><i class="fas fa-chevron-right"></i></span>
+            <a href="/city/<?php echo urlencode($serviceName); ?>/<?php echo urlencode($city); ?>">
+                <?php echo htmlspecialchars($city); ?>
+            </a>
+
+        </div>
+    </div>
+</section>
 
     <!-- Postings Grid -->
     <section class="featured-listings">
@@ -256,7 +294,9 @@ $db->close();
                         <div class="posting-content">
                             <div class="posting-header">
                                 <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>">
-                                    <h3 class="posting-title"><?php echo htmlspecialchars($posting['title']); ?></h3>
+                                     <h3 class="posting-title">
+                                        <?php echo htmlspecialchars(mb_strimwidth($posting['title'], 0, 80, '...')); ?>
+                                    </h3>
                                 </a>
                                 <div class="posting-price">
                                     <?php if (!empty($posting['price']) && $posting['price'] > 0): ?>
@@ -270,14 +310,16 @@ $db->close();
                                 <span><i class="fas fa-map-marker-alt"></i> <?php echo $posting['city']; ?></span>
                             </div>
                             <div class="posting-actions">
-                                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="whatsapp-btn" target="_blank">
-                                    <i class="fab fa-whatsapp"></i> WhatsApp
-                                </a>
-                                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn">
-                                    <i class="fas fa-phone"></i> Call
+                             <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>?text=<?php echo urlencode('Hi, I saw your ad on Admypost'); ?>" 
+                               class="whatsapp-btn" target="_blank">
+                               <i class="fab fa-whatsapp"></i>
+                            </a>
+                                                            
+                                                            <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn">
+                                    <i class="fas fa-phone"></i>
                                 </a>
                                 <a href="https://t.me/+<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="telegram-btn" target="_blank">
-                                    <i class="fab fa-telegram"></i> Telegram
+                                    <i class="fab fa-telegram"></i>
                                 </a>
                             </div>
                         </div>

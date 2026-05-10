@@ -30,7 +30,7 @@ elseif (isset($_GET['id']) && !empty($_GET['id'])) {
     }
     
     // Redirect to SEO-friendly URL
-    $newTitle = strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id'];
+    $newTitle = strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title'])));
     redirect('posting/' . $newTitle);
 } 
 else {
@@ -51,6 +51,7 @@ $author = $userModel->findById($posting['user_id']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://admypost.org/assets/logonewadd.png">
     <title><?php echo $posting['title']; ?> - <?php echo APP_NAME; ?></title>
     <meta name="description" content="<?php echo substr(strip_tags($posting['description']), 0, 160); ?>">
     <meta name="keywords" content="<?php echo $posting['title']; ?>, <?php echo $posting['category']; ?>, <?php echo $posting['city']; ?>, <?php echo $posting['state']; ?>">
@@ -97,7 +98,7 @@ $author = $userModel->findById($posting['user_id']);
     }
 }
 </script>
-    <link rel="stylesheet" href="/addposting/assets/css/style.css">
+    <link rel="stylesheet" href="https://admypost.org/assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .posting-detail {
@@ -208,16 +209,19 @@ $author = $userModel->findById($posting['user_id']);
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         border: 1px solid #333;
+        word-wrap: break-word;
         }
 
         .posting-description h3 {
             color: #dc3545;
             margin-bottom: 1rem;
+            word-wrap: break-word;
         }
 
         .posting-description p {
             line-height: 1.8;
             color: #a0aec0;
+            word-wrap: break-word;
         }
 
         .posting-actions {
@@ -359,6 +363,7 @@ $author = $userModel->findById($posting['user_id']);
             margin-bottom: 1rem;
             line-height: 1.6;
             font-size: 0.95rem;
+            word-wrap: break-word;
         }
 
         .posting-meta {
@@ -474,6 +479,7 @@ $author = $userModel->findById($posting['user_id']);
          @media (max-width: 768px) {
             .posting-main {
                 grid-template-columns: 1fr;
+                margin-top: 60px;
             }
 
             .main-image {
@@ -496,10 +502,50 @@ $author = $userModel->findById($posting['user_id']);
 </head>
 <body class="auth-body">
     <?php include 'includes/header.php'; ?>
-
-                    <?php if (isAdmin()): ?>
+      <?php if (isAdmin()): ?>
                         <li><a href="admin/dashboard.php" class="btn btn-danger">Admin Dashboard</a></li>
                     <?php endif; ?>
+     <!-- Mobile Navigation -->
+    <div class="mobile-nav-overlay"></div>
+    <div class="mobile-nav">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <i class="fas fa-store"></i>
+                <span><?php echo APP_NAME; ?></span>
+            </div>
+            <button class="mobile-nav-close" aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <?php if (isLoggedIn()): ?>
+        <div class="mobile-nav-user">
+            <i class="fas fa-user-circle"></i> My Account
+        </div>
+        <?php endif; ?>
+        <ul>
+            <li><a href="index.php" class="active"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <?php if (isLoggedIn()): ?>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>
+                    <div class="dropdown-content">
+                        <a href="dashboard.php">Dashboard</a>
+                        <a href="my-postings.php">My Postings</a>
+                        <a href="profile.php">Profile</a>
+                        <a href="logout.php">Logout</a>
+                    </div>
+                </li>
+            <?php else: ?>
+                <li><a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                <li><a href="register.php"><i class="fas fa-user-plus"></i> Register</a></li>
+            <?php endif; ?>
+            <?php if (isAdmin()): ?>
+                <li><a href="admin/dashboard.php"><i class="fas fa-cog"></i> Admin Dashboard</a></li>
+            <?php endif; ?>
+        </ul>
+    </div>
+
+                  
 <!-- Posting Detail -->
     <section class="posting-detail">
         <div class="container">
@@ -507,7 +553,7 @@ $author = $userModel->findById($posting['user_id']);
                 <div class="posting-gallery">
                     <div class="main-image">
                         <?php if (!empty($posting['images'])): ?>
-                            <img src="uploads/postings/<?php echo explode(',', $posting['images'])[0]; ?>" alt="<?php echo $posting['title']; ?>">
+                            <img src="https://admypost.org/uploads/postings/<?php echo explode(',', $posting['images'])[0]; ?>" alt="<?php echo $posting['title']; ?>">
                         <?php else: ?>
                             <div class="no-image">
                                 <i class="fas fa-image"></i>
@@ -517,7 +563,7 @@ $author = $userModel->findById($posting['user_id']);
                     <div class="image-thumbnails">
                         <?php if (!empty($posting['images'])): ?>
                             <?php foreach (explode(',', $posting['images']) as $key => $image): ?>
-                                <img src="uploads/postings/<?php echo $image; ?>" alt="Image <?php echo $key + 1; ?>" class="<?php echo $key === 0 ? 'active' : ''; ?>" data-index="<?php echo $key; ?>">
+                                <img src="https://admypost.org/uploads/postings/<?php echo $image; ?>" alt="Image <?php echo $key + 1; ?>" class="<?php echo $key === 0 ? 'active' : ''; ?>" data-index="<?php echo $key; ?>">
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
@@ -537,14 +583,15 @@ $author = $userModel->findById($posting['user_id']);
                     </div>
 
                                <div class="posting-actions">
-                                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="whatsapp-btn" target="_blank">
-                                    <i class="fab fa-whatsapp"></i> WhatsApp
-                                </a>
+                                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>?text=<?php echo urlencode('Hi, I saw your ad on Admypost'); ?>" 
+                                       class="whatsapp-btn" target="_blank">
+                                       <i class="fab fa-whatsapp"></i>
+                                    </a>
                                 <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn" target="_blank">
-                                    <i class="fas fa-phone"></i> Call Now
+                                    <i class="fas fa-phone"></i>
                                 </a>
                                 <a href="https://t.me/+<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="telegram-btn" target="_blank">
-                                    <i class="fab fa-telegram"></i> Telegram
+                                    <i class="fab fa-telegram"></i>
                                 </a>
                             </div>
 
@@ -591,17 +638,17 @@ $author = $userModel->findById($posting['user_id']);
                      foreach ($similarPostings as $similarPosting):
                      ?>
                      <div class="posting-card">
-                          <div class="posting-image">
-                              <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $similarPosting['title']))) . '-' . $similarPosting['id']; ?>" style="display: block; width: 100%; height: 100%;">
-                              <?php if (!empty($similarPosting['images'])): ?>
-                                  <img src="uploads/postings/<?php echo explode(',', $similarPosting['images'])[0]; ?>" alt="<?php echo $similarPosting['title']; ?>">
-                              <?php else: ?>
-                                  <div style="width: 100%; height: 100%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; color: #4a5568;">
-                                      <i class="fas fa-image" style="font-size: 3rem;"></i>
-                                  </div>
-                              <?php endif; ?>
-                              </a>
-                          </div>
+                         <div class="posting-image">
+                             <a href="https://admypost.org/posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $similarPosting['title']))). '-' . $similarPosting['id']; ?>" style="display: block; width: 100%; height: 100%;">
+                             <?php if (!empty($similarPosting['images'])): ?>
+                                 <img src="https://admypost.org/uploads/postings/<?php echo explode(',', $similarPosting['images'])[0]; ?>" alt="<?php echo $similarPosting['title']; ?>">
+                             <?php else: ?>
+                                 <div style="width: 100%; height: 100%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; color: #4a5568;">
+                                     <i class="fas fa-image" style="font-size: 3rem;"></i>
+                                 </div>
+                             <?php endif; ?>
+                             </a>
+                         </div>
                          <div class="posting-content">
                              <h3 class="posting-title"><?php echo $similarPosting['title']; ?></h3>
                              <p class="posting-description"><?php echo substr($similarPosting['description'], 0, 150); ?>...</p>

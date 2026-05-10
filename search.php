@@ -21,8 +21,6 @@ if ($result && $result->num_rows > 0) {
 $category = isset($_GET['category']) ? sanitize($_GET['category']) : null;
 $state = isset($_GET['state']) ? sanitize($_GET['state']) : null;
 $city = isset($_GET['city']) ? sanitize($_GET['city']) : null;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$perPage = 10;
 
 // Get active categories for dropdown (for case-sensitive matching)
 $dbCategories = [];
@@ -90,12 +88,12 @@ if ($state) {
 
 // Get postings based on filters
 $filteredPostings = [];
-$totalPostings = 0;
 $postingModel = new Posting();
 
-$offset = ($page - 1) * $perPage;
-$filteredPostings = $postingModel->getAll($category, null, $state, $city, $perPage, $offset);
-$totalPostings = $postingModel->getTotalCount($category, null, $state, $city);
+if ($category || $state || $city) {
+    // Get filtered postings
+    $filteredPostings = $postingModel->getAll($category, null, $state, $city);
+}
 
 // Build page title
 $pageTitle = 'Search Results';
@@ -117,7 +115,7 @@ if ($category && $city) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/addposting/">
+    <base href="/">
     <meta name="description" content="Search <?php echo $category ? ucfirst($category) : ''; ?> listings in <?php echo $city ? $city : ($state ? $state : 'India'); ?>. Find the best <?php echo $category ? strtolower($category) : 'services'; ?> near you.">
     <meta name="keywords" content="<?php echo $category ? $category : 'postings'; ?>, <?php echo $city ? $city : ''; ?>, <?php echo $state ? $state : ''; ?>, classified ads, listings">
     <meta property="og:title" content="<?php echo $pageTitle; ?> - <?php echo APP_NAME; ?>">
@@ -142,7 +140,7 @@ if ($category && $city) {
                 {
                     "@type": "ListItem",
                     "position": <?php echo $index + 1; ?>,
-                    "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>"
+                    "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/add-posting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>"
                 }<?php echo $index < min(4, count($filteredPostings) - 1) ? ',' : ''; ?>
                 <?php endforeach; ?>
             ]
@@ -222,7 +220,7 @@ if ($category && $city) {
             <nav>
                 <ul>
                     <li><a href="index.php">Home</a></li>
-                    <li><a href="addposting.php" class="btn btn-primary">Add Posting</a></li>
+                    <li><a href="add-posting.php" class="btn btn-primary">Add Posting</a></li>
                     <?php if (isLoggedIn()): ?>
                         <li class="dropdown">
                             <a href="#"><i class="fas fa-user"></i> My Account</a>
@@ -264,7 +262,7 @@ if ($category && $city) {
         <?php endif; ?>
         <ul>
             <li><a href="index.php"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
             <?php if (isLoggedIn()): ?>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle"><i class="fas fa-user"></i> My Account</a>
@@ -293,32 +291,49 @@ if ($category && $city) {
         </div>
     </section>
 
-    <!-- Search Filters Bar -->
-    <section class="search-filters-bar">
-        <div class="container">
-            <a href="index.php" class="filter-tag">
-                <i class="fas fa-home"></i> Home
+  <section class="search-filters-bar">
+    <div class="container">
+
+        <!-- Home -->
+        <a href="search.php" class="filter-tag">
+            <i class="fas fa-home"></i> Home
+        </a>
+
+        <!-- Category -->
+        <?php if ($category): ?>
+            <a href="search.php?category=<?php echo urlencode($category); ?>" class="filter-tag">
+                <i class="fas fa-tag"></i> <?php echo ucfirst($category); ?>
             </a>
-            <?php if ($category): ?>
-                <span class="filter-tag">
-                    <i class="fas fa-tag"></i> <?php echo ucfirst($category); ?>
-                </span>
-            <?php endif; ?>
-            <?php if ($state): ?>
-                <span class="filter-tag">
-                    <i class="fas fa-map-marker-alt"></i> <?php echo $state; ?>
-                </span>
-            <?php endif; ?>
-            <?php if ($city): ?>
-                <span class="filter-tag">
-                    <i class="fas fa-map-marker"></i> <?php echo $city; ?>
-                </span>
-            <?php endif; ?>
-            <span class="results-count">
-                Found <?php echo count($filteredPostings); ?> posting<?php echo count($filteredPostings) != 1 ? 's' : ''; ?>
-            </span>
-        </div>
-    </section>
+        <?php endif; ?>
+
+        <!-- State -->
+        <?php if ($state): ?>
+            <a href="search.php?<?php 
+                echo $category ? 'category=' . urlencode($category) . '&' : ''; 
+                echo 'state=' . urlencode($state); 
+            ?>" class="filter-tag">
+                <i class="fas fa-map-marker-alt"></i> <?php echo $state; ?>
+            </a>
+        <?php endif; ?>
+
+        <!-- City -->
+        <?php if ($city): ?>
+            <a href="search.php?<?php 
+                echo $category ? 'category=' . urlencode($category) . '&' : ''; 
+                echo $state ? 'state=' . urlencode($state) . '&' : ''; 
+                echo 'city=' . urlencode($city); 
+            ?>" class="filter-tag">
+                <i class="fas fa-map-marker"></i> <?php echo $city; ?>
+            </a>
+        <?php endif; ?>
+
+        <!-- Results Count -->
+        <span class="results-count">
+            Found <?php echo count($filteredPostings); ?> posting<?php echo count($filteredPostings) != 1 ? 's' : ''; ?>
+        </span>
+
+    </div>
+</section>
 
     <!-- Search Form -->
     <section class="index-hero" style="padding: 2rem 0;" >
@@ -442,7 +457,7 @@ if ($category && $city) {
                     <?php foreach ($filteredPostings as $index => $posting): ?>
                     <div class="posting-card">
                             <div class="posting-image">
-<a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>" style="display: block; width: 100%; height: 100%;">
+<a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>" style="display: block; width: 100%; height: 100%;">
                                 <?php if (!empty($posting['images'])): ?>
                                     <img src="uploads/postings/<?php echo explode(',', $posting['images'])[0]; ?>" alt="<?php echo $posting['title']; ?>">
                                 <?php else: ?>
@@ -454,14 +469,18 @@ if ($category && $city) {
                             </div>
                             <div class="posting-content">
                                 <div class="posting-header">
-                                    <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>" style="display: block; width: 100%; height: 100%;"><h3 class="posting-title"><?php echo $posting['title']; ?></h3></a>
+                                    <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>" style="display: block; width: 100%; height: 100%;">
+                                         <h3 class="posting-title">
+                                        <?php echo htmlspecialchars(mb_strimwidth($posting['title'], 0, 80, '...')); ?>
+                                    </h3>
+                                        </a>
                                     <div class="posting-price">
                                         <?php if (!empty($posting['price']) && $posting['price'] > 0): ?>
                                             ₹<?php echo number_format($posting['price'], 2); ?>/hr
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <p class="posting-description"><?php echo substr($posting['description'], 0, 150); ?>...</p>
+                                <p class="posting-description"><?php echo substr($posting['description'], 0, 100); ?>...</p>
                                 <div class="posting-meta">
                                     <span><i class="fas fa-calendar"></i> <?php echo rand(2, 25); ?> Years</span>
                                     <span><i class="fas fa-map-marker-alt"></i> <?php echo $posting['city'] . ', ' . $posting['state']; ?></span>
@@ -469,13 +488,10 @@ if ($category && $city) {
                                 </div>
                                 <div class="posting-actions">
                                     <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="whatsapp-btn" target="_blank">
-                                        <i class="fab fa-whatsapp"></i> WhatsApp
+                                        <i class="fab fa-whatsapp"></i>
                                     </a>
                                     <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn" target="_blank">
-                                        <i class="fas fa-phone"></i> Call Now
-                                    </a>
-                                    <a href="https://t.me/+<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="telegram-btn" target="_blank">
-                                        <i class="fab fa-telegram"></i> Telegram
+                                        <i class="fas fa-phone"></i>
                                     </a>
                                 </div>
                             </div>
@@ -489,21 +505,11 @@ if ($category && $city) {
                             No postings match your selected filters. Try different category or state.
                         </p>
                         <?php if (isLoggedIn()): ?>
-                            <a href="addposting.php" class="btn btn-primary">Add Posting</a>
+                            <a href="add-posting.php" class="btn btn-primary">Add Posting</a>
                         <?php else: ?>
                             <a href="register.php" class="btn btn-primary">Register to Post</a>
                         <?php endif; ?>
                     </div>
-                <?php endif; ?>
-
-                <?php if (!empty($filteredPostings) && $totalPostings > $perPage): ?>
-                    <?php
-                    $queryParams = [];
-                    if ($category) $queryParams['category'] = $category;
-                    if ($state) $queryParams['state'] = $state;
-                    if ($city) $queryParams['city'] = $city;
-                    echo generatePagination($totalPostings, $perPage, $page, 'search.php', $queryParams);
-                    ?>
                 <?php endif; ?>
             </div>
         </div>

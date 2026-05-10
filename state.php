@@ -78,8 +78,8 @@ $db->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="/addposting/">
-    <title><?php echo $pageTitle; ?></title>
-    <meta name="description" content="<?php echo $pageDescription; ?>">
+    <title><?php echo $pageTitle; ?> Male Escorts & Call Boy, Play Boy Job And Gay Escort Adult Meeting</title>
+    <meta name="description" content="<?php echo $pageDescription; ?>Find on MALE ESCORTS and gay escorts category +1200 call boys ads Play Boy available. Amateur and professional ads on Admypost, find yours now and enjoy!">
     <meta name="keywords" content="<?php echo $state; ?>, services <?php echo $state; ?>, listings <?php echo $state; ?>, <?php echo implode(', ', $citiesInState); ?>">
     <meta property="og:title" content="<?php echo $pageTitle; ?>">
     <meta property="og:description" content="<?php echo $pageDescription; ?>">
@@ -202,7 +202,9 @@ $db->close();
                         </div>
                         <div class="posting-content">
                             <div class="posting-header">
-                                <h3 class="posting-title"><?php echo htmlspecialchars($posting['title']); ?></h3>
+                               <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>">  <h3 class="posting-title">
+                                        <?php echo htmlspecialchars(mb_strimwidth($posting['title'], 0, 80, '...')); ?>
+                                    </h3></a>
                                 <div class="posting-price">
                                     <?php if (!empty($posting['price']) && $posting['price'] > 0): ?>
                                         ₹<?php echo number_format($posting['price'], 2); ?>/hr
@@ -215,14 +217,15 @@ $db->close();
                                 <span><?php echo $posting['city']; ?></span>
                             </div>
                             <div class="posting-actions">
-                                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="whatsapp-btn" target="_blank">
-                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>?text=<?php echo urlencode('Hi, I saw your ad on Admypost'); ?>" 
+                                   class="whatsapp-btn" target="_blank">
+                                   <i class="fab fa-whatsapp"></i>
                                 </a>
                                 <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="call-btn">
-                                    <i class="fas fa-phone"></i> Call
+                                    <i class="fas fa-phone"></i>
                                 </a>
                                 <a href="https://t.me/+<?php echo preg_replace('/[^0-9]/', '', $posting['contact']); ?>" class="telegram-btn" target="_blank">
-                                    <i class="fab fa-telegram"></i> Telegram
+                                    <i class="fab fa-telegram"></i>
                                 </a>
                             </div>
                         </div>

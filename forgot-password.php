@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <nav>
                 <ul>
                     <li><a href="index.php">Home</a></li>            
-                    <li><a href="addposting.php">Add Posting</a></li>
+                    <li><a href="add-posting.php">Add Posting</a></li>
                     <?php if (isLoggedIn()): ?>
                         <li><a href="dashboard.php">Dashboard</a></li>
                         <li><a href="logout.php">Logout</a></li>
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <ul>
             <li><a href="index.php"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="addposting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
+            <li><a href="add-posting.php"><i class="fas fa-plus-circle"></i> Add Posting</a></li>
             <?php if (isLoggedIn()): ?>
                 <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
