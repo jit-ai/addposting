@@ -142,7 +142,7 @@ if ($category && $city) {
                 {
                     "@type": "ListItem",
                     "position": <?php echo $index + 1; ?>,
-                    "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>"
+                    "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>"
                 }<?php echo $index < min(4, count($filteredPostings) - 1) ? ',' : ''; ?>
                 <?php endforeach; ?>
             ]
@@ -442,7 +442,7 @@ if ($category && $city) {
                     <?php foreach ($filteredPostings as $index => $posting): ?>
                     <div class="posting-card">
                             <div class="posting-image">
-<a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>" style="display: block; width: 100%; height: 100%;">
+<a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>" style="display: block; width: 100%; height: 100%;">
                                 <?php if (!empty($posting['images'])): ?>
                                     <img src="uploads/postings/<?php echo explode(',', $posting['images'])[0]; ?>" alt="<?php echo $posting['title']; ?>">
                                 <?php else: ?>
@@ -454,7 +454,7 @@ if ($category && $city) {
                             </div>
                             <div class="posting-content">
                                 <div class="posting-header">
-                                    <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>" style="display: block; width: 100%; height: 100%;"><h3 class="posting-title"><?php echo $posting['title']; ?></h3></a>
+                                    <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>" style="display: block; width: 100%; height: 100%;"><h3 class="posting-title"><?php echo $posting['title']; ?></h3></a>
                                     <div class="posting-price">
                                         <?php if (!empty($posting['price']) && $posting['price'] > 0): ?>
                                             ₹<?php echo number_format($posting['price'], 2); ?>/hr

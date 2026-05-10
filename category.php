@@ -105,11 +105,11 @@ $db->close();
                 {
                     "@type": "ListItem",
                     "position": <?php echo $index + 1; ?>,
-                    "item": {
-                        "@type": "Service",
-                        "name": "<?php echo addslashes($posting['title']); ?>",
-                        "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>"
-                    }
+                        "item": {
+                            "@type": "Service",
+                            "name": "<?php echo addslashes($posting['title']); ?>",
+                            "url": "<?php echo 'https://' . $_SERVER['HTTP_HOST'] . '/addposting/posting/' . strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>"
+                        }
                 }<?php echo $index < min(4, count($filteredPostings) - 1) ? ',' : ''; ?>
                 <?php endforeach; ?>
             ]
@@ -283,7 +283,7 @@ $db->close();
                     <?php foreach ($filteredPostings as $posting): ?>
                     <div class="posting-card">
                         <div class="posting-image">
-                            <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>">
+                            <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>">
                                 <?php if (!empty($posting['images'])): ?>
                                     <img src="uploads/postings/<?php echo explode(',', $posting['images'])[0]; ?>" alt="<?php echo htmlspecialchars($posting['title']); ?>">
                                 <?php else: ?>
@@ -295,7 +295,7 @@ $db->close();
                         </div>
                         <div class="posting-content">
                             <div class="posting-header">
-                                <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>">
+                                <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>">
                                     <h3 class="posting-title"><?php echo htmlspecialchars($posting['title']); ?></h3>
                                 </a>
                                 <div class="posting-price">

@@ -190,7 +190,7 @@ $db->close();
                     <div class="posting-card">
                         <!-- Same posting card structure as category/city -->
                         <div class="posting-image">
-                            <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>">
+                            <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>">
                                 <?php if (!empty($posting['images'])): ?>
                                     <img src="uploads/postings/<?php echo explode(',', $posting['images'])[0]; ?>" alt="<?php echo htmlspecialchars($posting['title']); ?>">
                                 <?php else: ?>

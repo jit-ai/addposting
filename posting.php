@@ -17,7 +17,7 @@ if (isset($_GET['title']) && !empty($_GET['title'])) {
     
     // Redirect to clean URL if old format with id is used
     if (isset($_GET['id'])) {
-        $newTitle = strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title'])));
+        $newTitle = strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id'];
         redirect('posting/' . $newTitle);
     }
 } 
@@ -30,7 +30,7 @@ elseif (isset($_GET['id']) && !empty($_GET['id'])) {
     }
     
     // Redirect to SEO-friendly URL
-    $newTitle = strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title'])));
+    $newTitle = strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id'];
     redirect('posting/' . $newTitle);
 } 
 else {
@@ -591,17 +591,17 @@ $author = $userModel->findById($posting['user_id']);
                      foreach ($similarPostings as $similarPosting):
                      ?>
                      <div class="posting-card">
-                         <div class="posting-image">
-                             <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $similarPosting['title']))); ?>" style="display: block; width: 100%; height: 100%;">
-                             <?php if (!empty($similarPosting['images'])): ?>
-                                 <img src="uploads/postings/<?php echo explode(',', $similarPosting['images'])[0]; ?>" alt="<?php echo $similarPosting['title']; ?>">
-                             <?php else: ?>
-                                 <div style="width: 100%; height: 100%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; color: #4a5568;">
-                                     <i class="fas fa-image" style="font-size: 3rem;"></i>
-                                 </div>
-                             <?php endif; ?>
-                             </a>
-                         </div>
+                          <div class="posting-image">
+                              <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $similarPosting['title']))) . '-' . $similarPosting['id']; ?>" style="display: block; width: 100%; height: 100%;">
+                              <?php if (!empty($similarPosting['images'])): ?>
+                                  <img src="uploads/postings/<?php echo explode(',', $similarPosting['images'])[0]; ?>" alt="<?php echo $similarPosting['title']; ?>">
+                              <?php else: ?>
+                                  <div style="width: 100%; height: 100%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; color: #4a5568;">
+                                      <i class="fas fa-image" style="font-size: 3rem;"></i>
+                                  </div>
+                              <?php endif; ?>
+                              </a>
+                          </div>
                          <div class="posting-content">
                              <h3 class="posting-title"><?php echo $similarPosting['title']; ?></h3>
                              <p class="posting-description"><?php echo substr($similarPosting['description'], 0, 150); ?>...</p>

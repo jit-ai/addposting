@@ -317,7 +317,7 @@ $totalUserPostings = $postingModel->countByUserId($_SESSION['user_id']);
                                 <?php endif; ?>
                             </div>
                             <div class="posting-item-actions">
-                                <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))); ?>" class="btn btn-sm btn-secondary">
+                                <a href="posting/<?php echo strtolower(str_replace(' ', '-', preg_replace('/[^a-zA-Z0-9 ]/', '', $posting['title']))) . '-' . $posting['id']; ?>" class="btn btn-sm btn-secondary">
                                     <i class="fas fa-eye"></i> View
                                 </a>
                                 <a href="edit-posting.php?id=<?php echo $posting['id']; ?>" class="btn btn-sm btn-primary">
