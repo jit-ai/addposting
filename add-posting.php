@@ -869,7 +869,7 @@ elseif (isLoggedIn()) {
             'Delhi': ['Central Delhi', 'East Delhi', 'New Delhi', 'North Delhi', 'North East Delhi', 'North West Delhi', 'Shahdara', 'South Delhi', 'South East Delhi', 'South West Delhi', 'West Delhi']
         };
 
-        function loadCities(state) {
+        function loadCities(state, selectRandom = false) {
             const citySelect = document.getElementById('city');
             citySelect.innerHTML = '<option value="">Select a city</option>';
             
@@ -880,8 +880,20 @@ elseif (isLoggedIn()) {
                     option.textContent = city;
                     citySelect.appendChild(option);
                 });
+                
+                if (selectRandom && citiesByState[state].length > 0) {
+                    const randomIndex = Math.floor(Math.random() * citiesByState[state].length);
+                    citySelect.selectedIndex = randomIndex + 1;
+                }
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const stateSelect = document.getElementById('state');
+            if (stateSelect.value) {
+                loadCities(stateSelect.value, true);
+            }
+        });
 
         // Schedule fields toggle
         const publishSelect = document.getElementById('publish');

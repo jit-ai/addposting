@@ -246,6 +246,21 @@ public function create($data) {
         return $stmt->execute();
     }
 
+    public function updateUserContact($userId, $contact) {
+        $conn = $this->db->getConnection();
+        
+        $contact = preg_replace('/[^0-9]/', '', $contact);
+        if (!empty($contact)) {
+            $contact = '91' . $contact;
+        }
+        
+        $sql = "UPDATE " . $this->table . " SET contact = ?, updated_at = NOW() WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("si", $contact, $userId);
+        
+        return $stmt->execute();
+    }
+
     public function delete($id) {
         $conn = $this->db->getConnection();
         

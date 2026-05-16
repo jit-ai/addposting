@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/functions.php';
 require_once '../includes/User.php';
+require_once '../includes/Posting.php';
 
 // Check if user is logged in and is admin
 if (!isLoggedIn() || !isAdmin()) {
@@ -8,6 +9,7 @@ if (!isLoggedIn() || !isAdmin()) {
 }
 
 $userModel = new User();
+$postingModel = new Posting();
 
 // Handle form submission
 $errors = [];
@@ -21,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = sanitize($_POST['email']);
         $role = sanitize($_POST['role']);
         $status = sanitize($_POST['status']);
+        $updateAllContact = isset($_POST['update_all_contact']) ? true : false;
+        $contact = isset($_POST['contact']) ? sanitize($_POST['contact']) : '';
 
         if (empty($name)) {
             $errors[] = 'Name is required';
@@ -47,7 +51,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'role' => $role,
                 'status' => $status
             ])) {
-                $success = 'User updated successfully!';
+                $updatedPostings = 0;
+                if ($updateAllContact && !empty($contact)) {
+                    $updatedPostings = $postingModel->updateUserContact($id, $contact);
+                }
+                if ($updatedPostings > 0) {
+                    $success = 'User and ' . $updatedPostings . ' posting(s) contact updated successfully!';
+                } else {
+                    $success = 'User updated successfully!';
+                }
             } else {
                 $errors[] = 'Failed to update user. Please try again.';
             }
@@ -168,7 +180,7 @@ $users = $userModel->getAllUsers();
         }
 
         .modal-content {
-            background: white;
+            background: #000;
             padding: 2rem;
             border-radius: 10px;
             max-width: 600px;
@@ -281,6 +293,7 @@ $users = $userModel->getAllUsers();
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Posts</th>
                             <th>Role</th>
                             <th>Status</th>
                             <th>Created At</th>
@@ -293,6 +306,7 @@ $users = $userModel->getAllUsers();
                             <tr>
                                 <td><?php echo $user['name']; ?></td>
                                 <td><?php echo $user['email']; ?></td>
+                                <td><?php echo $postingModel->countByUserId($user['id']); ?></td>
                                 <td>
                                     <span class="role-badge role-<?php echo $user['role']; ?>">
                                         <?php echo ucfirst($user['role']); ?>
@@ -369,6 +383,21 @@ $users = $userModel->getAllUsers();
                 </div>
                 
                 <div class="form-group">
+                    <label for="editUserContact">Update All Postings Contact (Optional)</label>
+                    <div style="display:flex;">
+                        <span style="padding: 0.75rem; background:#f8f9fa; border:1px solid #e2e8f0; border-right:none; border-radius:8px 0 0 8px; color:#4a5568; font-weight:bold;">+91</span>
+                        <input type="tel" id="editUserContact" name="contact" placeholder="Enter phone number" pattern="[0-9]{10}" maxlength="10" style="flex:1; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0 8px 8px 0;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" name="update_all_contact" value="1" style="width: 18px; height: 18px;">
+                        <span>Update contact for all user's postings</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
                     <button type="submit" class="btn btn-primary btn-block">Update User</button>
                 </div>
             </form>
@@ -418,6 +447,7 @@ $users = $userModel->getAllUsers();
             const editUserEmail = document.getElementById('editUserEmail');
             const editUserRole = document.getElementById('editUserRole');
             const editUserStatus = document.getElementById('editUserStatus');
+            const editUserContact = document.getElementById('editUserContact');
 
             editUserButtons.forEach(button => {
                 button.addEventListener('click', function() {
@@ -427,6 +457,7 @@ $users = $userModel->getAllUsers();
                     editUserEmail.value = user.email;
                     editUserRole.value = user.role;
                     editUserStatus.value = user.status;
+                    editUserContact.value = '';
                     editUserModal.classList.add('active');
                 });
             });
